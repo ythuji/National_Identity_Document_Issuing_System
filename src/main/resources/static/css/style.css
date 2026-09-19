@@ -470,7 +470,9 @@ main {
     font-family: 'Manrope', 'Segoe UI', sans-serif;
 }
 /* Hide the public-facing navbar entirely on admin pages */
-.admin-page .nidis-navbar { display: none !important; }
+.admin-page .nidis-navbar,
+body.adm .nidis-navbar,
+.adm-shell .nidis-navbar { display: none !important; }
 
 /* ── Two-column wrapper ───────────────────────────────── */
 .admin-layout {

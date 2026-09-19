@@ -3,86 +3,54 @@
       xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <body>
 
-<nav th:fragment="sidebar(activeTab)" class="admin-sidebar">
+<nav th:fragment="sidebar(activeTab)" class="adm-sb">
 
-    <!-- ── Brand / Logo ───────────────────────────────────── -->
-    <div class="admin-sidebar__brand">
-        <div class="admin-sidebar__mark">
-            <i class="bi bi-shield-shaded"></i>
-        </div>
-        <div>
-            <div class="admin-sidebar__title">NIDIS</div>
-            <span class="admin-sidebar__subtitle">CONTROL PANEL</span>
-        </div>
+    <!-- ── Brand ─────────────────────────────────────────── -->
+    <div class="adm-sb-brand">
+      <div class="adm-sb-icon"><i class="bi bi-shield-shaded"></i></div>
+      <div>
+        <div class="adm-sb-title">NIDIS</div>
+        <div class="adm-sb-sub">CONTROL PANEL</div>
+      </div>
     </div>
 
     <!-- ── Navigation ─────────────────────────────────────── -->
-    <div class="admin-sidebar__nav">
+    <div class="adm-sb-nav">
+      <div class="adm-sb-grp">Core</div>
+      <a class="adm-sb-link" th:classappend="${activeTab == 'dashboard' ? 'active' : ''}" th:href="@{/admin/dashboard}">
+        <span class="adm-sb-lico"><i class="bi bi-speedometer2"></i></span>Dashboard
+      </a>
+      <a class="adm-sb-link" th:classappend="${activeTab == 'queue' ? 'active' : ''}" th:href="@{/verification/queue}">
+        <span class="adm-sb-lico"><i class="bi bi-clipboard-check"></i></span>Verification Queue
+      </a>
 
-        <!-- Section: Core Portal -->
-        <div class="sidebar-heading"><span>Core Portal</span><i class="bi bi-arrow-up-right"></i></div>
-        <ul class="nav flex-column mb-0">
-            <li class="nav-item">
-                <a class="nav-link" th:href="@{/admin/dashboard}"
-                   th:classappend="${activeTab == 'dashboard' ? 'active' : ''}">
-                    <span class="nav-link__icon"><i class="bi bi-speedometer2"></i></span>
-                    <span>Admin Dashboard</span>
-                </a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" th:href="@{/verification/queue}"
-                   th:classappend="${activeTab == 'queue' ? 'active' : ''}">
-                    <span class="nav-link__icon"><i class="bi bi-clipboard-check"></i></span>
-                    <span>Verification Queue</span>
-                </a>
-            </li>
-        </ul>
+      <div class="adm-sb-grp">Management</div>
+      <a class="adm-sb-link" th:classappend="${activeTab == 'users' ? 'active' : ''}" th:href="@{/admin/users}">
+        <span class="adm-sb-lico"><i class="bi bi-people"></i></span>User Management
+      </a>
+      <a class="adm-sb-link" th:classappend="${activeTab == 'audit' ? 'active' : ''}" th:href="@{/admin/audit-log}">
+        <span class="adm-sb-lico"><i class="bi bi-journal-text"></i></span>Audit Trail
+      </a>
+    </div>
 
-        <!-- Section: Management & Security -->
-        <div class="sidebar-heading"><span>Management &amp; Security</span><i class="bi bi-arrow-up-right"></i></div>
-        <ul class="nav flex-column mb-0">
-            <li class="nav-item">
-                <a class="nav-link" th:href="@{/admin/users}"
-                   th:classappend="${activeTab == 'users' ? 'active' : ''}">
-                    <span class="nav-link__icon"><i class="bi bi-people"></i></span>
-                    <span>User Management</span>
-                </a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" th:href="@{/admin/audit-log}"
-                   th:classappend="${activeTab == 'audit' ? 'active' : ''}">
-                    <span class="nav-link__icon"><i class="bi bi-journal-text"></i></span>
-                    <span>Audit Trail Log</span>
-                </a>
-            </li>
-        </ul>
-
-    </div><!-- /.admin-sidebar__nav -->
-
-    <!-- ── Sidebar Footer (account + logout) ──────────────── -->
-    <div class="admin-sidebar__footer">
-        <!-- System status row -->
-        <div class="admin-sidebar__status">
-            <span class="admin-sidebar__status-dot"></span>
-            <span>Systems operational</span>
+    <!-- ── Sidebar Footer ─────────────────────────────────── -->
+    <div class="adm-sb-foot">
+      <div class="adm-sb-sys">
+        <span class="adm-sb-dot"></span>All systems operational
+      </div>
+      <div class="adm-sb-user">
+        <div class="adm-sb-av"><i class="bi bi-person-fill"></i></div>
+        <div style="min-width:0;flex:1">
+          <div class="adm-sb-uname" sec:authentication="principal.username">Administrator</div>
+          <div class="adm-sb-urole">Super Admin</div>
         </div>
-
-        <!-- Logged-in user row -->
-        <div class="admin-sidebar__user-row">
-            <span class="admin-sidebar__user-avatar"><i class="bi bi-person-fill"></i></span>
-            <div class="admin-sidebar__user-info">
-                <span class="admin-sidebar__user-name" sec:authentication="principal.username">Administrator</span>
-                <span class="admin-sidebar__user-role">Super Admin</span>
-            </div>
-            <!-- Logout -->
-            <form th:action="@{/logout}" method="post" class="ms-auto">
-                <button type="submit" class="admin-sidebar__logout-btn" title="Sign out">
-                    <i class="bi bi-box-arrow-right"></i>
-                </button>
-            </form>
-        </div>
-
-        <span class="admin-sidebar__version">NIDIS / 2026</span>
+        <form th:action="@{/logout}" method="post">
+          <button type="submit" class="adm-sb-logout" title="Sign out">
+            <i class="bi bi-box-arrow-right"></i>
+          </button>
+        </form>
+      </div>
+      <div class="adm-sb-ver">NIDIS · 2026</div>
     </div>
 
 </nav>

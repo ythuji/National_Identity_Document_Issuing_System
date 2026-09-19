@@ -4,15 +4,17 @@
 <head th:replace="~{fragments/header :: head('Document Verification & Assessment')}"></head>
 <body class="officer-page d-flex flex-column min-vh-100">
 
-<nav th:replace="~{fragments/header :: navbar}"></nav>
+<nav sec:authorize="!hasAuthority('SUPER_ADMIN')" th:replace="~{fragments/header :: navbar}"></nav>
 
 <!-- Admin Layout with Sidebar (When Logged in as SUPER_ADMIN) -->
-<div class="admin-layout" sec:authorize="hasAuthority('SUPER_ADMIN')">
-    <aside th:replace="~{fragments/sidebar :: sidebar('queue')}"></aside>
-    <main class="admin-content">
+<div class="adm-shell" sec:authorize="hasAuthority('SUPER_ADMIN')">
+    <nav th:replace="~{fragments/sidebar :: sidebar('queue')}"></nav>
+    <div class="adm-main">
         <header th:replace="~{fragments/admin-topbar :: topbar('Application Review')}"></header>
-        <div th:replace="~{::reviewBody}"></div>
-    </main>
+        <div class="adm-page">
+            <div th:replace="~{::reviewBody}"></div>
+        </div>
+    </div>
 </div>
 
 <!-- Officer Layout Full-Width (When Logged in as Officer / Non-Admin) -->
@@ -398,7 +400,7 @@
     </div>
 </div>
 
-<footer th:replace="~{fragments/footer :: footer}"></footer>
+<footer sec:authorize="!hasAuthority('SUPER_ADMIN')" th:replace="~{fragments/footer :: footer}"></footer>
 <th:block th:replace="~{fragments/footer :: scripts}"></th:block>
 </body>
 </html>

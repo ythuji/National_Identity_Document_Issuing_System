@@ -1,111 +1,120 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head th:replace="~{fragments/header :: head('System Audit Log')}"></head>
-<body class="admin-page">
+<body class="adm">
 
-<!-- Admin Unified Layout -->
-<div class="admin-layout">
-    <!-- Sidebar -->
-    <aside th:replace="~{fragments/sidebar :: sidebar('audit')}"></aside>
+<div class="adm-shell">
 
-    <!-- Main Content Area -->
-    <main class="admin-content">
-        <header th:replace="~{fragments/admin-topbar :: topbar('Security Audit')}"></header>
+    <!-- ══════════════════════════ SIDEBAR ══════════════════════════ -->
+    <nav th:replace="~{fragments/sidebar :: sidebar('audit')}"></nav>
 
-        <!-- Header Title Bar -->
-        <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
-            <div>
-                <h4 class="fw-bold mb-0 text-dark">
-                    <i class="bi bi-journal-text me-2 text-primary"></i>System Security & Audit Trail
-                </h4>
-                <p class="text-muted small mb-0">Immutable tracking of user activities, document approvals, status changes, and administrative actions.</p>
+    <!-- ══════════════════════════ MAIN ══════════════════════════ -->
+    <div class="adm-main">
+
+        <!-- Topbar -->
+        <header th:replace="~{fragments/admin-topbar :: topbar('Audit Trail')}"></header>
+
+        <!-- Page Content -->
+        <div class="adm-page">
+
+            <!-- Page Header -->
+            <div class="adm-ph">
+                <div>
+                    <div class="adm-ph-title">System Security &amp; Audit Trail</div>
+                    <div class="adm-ph-sub">Immutable tracking of user activities, document approvals, status changes, and administrative actions</div>
+                </div>
+                <div class="adm-ph-actions">
+                    <span class="abadge ab-ok" style="font-size: 0.68rem; padding: 5px 10px;">
+                        <i class="bi bi-broadcast"></i> Live Feed
+                    </span>
+                    <span class="badge bg-white text-secondary border px-3 py-2 shadow-sm" style="font-size: 0.72rem; border-radius: 7px; display: inline-flex; align-items: center; gap: 6px;">
+                        Total Events: <strong class="text-dark" th:text="${#lists.size(logs)}">0</strong>
+                    </span>
+                </div>
             </div>
-            <div class="d-flex gap-2 align-items-center">
-                <span class="badge bg-white text-secondary border px-3 py-1.5 shadow-sm small">
-                    Total Events: <strong class="text-dark" th:text="${#lists.size(logs)}">0</strong>
-                </span>
-                <span class="badge badge-subtle-success px-2.5 py-1.5 small">
-                    <i class="bi bi-broadcast me-1"></i>Live Feed
-                </span>
-            </div>
-        </div>
 
-        <!-- Audit Logs Table Card -->
-        <div class="card border-0 shadow-sm">
-            <div class="card-header py-2.5 px-3 bg-white d-flex justify-content-between align-items-center border-bottom">
-                <span class="fw-bold text-dark small text-uppercase" style="letter-spacing: 0.5px;">
-                    <i class="bi bi-shield-check me-1.5 text-success"></i>Security Event Trail
-                </span>
-                <span class="text-muted small" style="font-size: 0.75rem;">Chronological order (Newest first)</span>
-            </div>
-            <div class="card-body p-0">
+            <!-- Audit Logs Table Card -->
+            <div class="adm-table-card">
+                <div class="adm-card-hd">
+                    <div class="adm-card-ttl">
+                        <div class="adm-card-ico" style="background:#ccfbf1;color:#0d9488"><i class="bi bi-shield-check"></i></div>
+                        Security Event Trail
+                    </div>
+                    <div class="text-muted" style="font-size: 0.68rem; font-weight: 600;">
+                        Chronological order (Newest first)
+                    </div>
+                </div>
+
                 <div class="table-responsive">
-                    <table class="table table-admin align-middle mb-0">
+                    <table class="adm-tbl">
                         <thead>
                             <tr>
-                                <th style="width: 160px;" class="ps-3">Timestamp</th>
-                                <th style="width: 190px;">Actor / Operator</th>
+                                <th style="width: 160px; padding-left: 18px;">Timestamp</th>
+                                <th style="width: 200px;">Actor / Operator</th>
                                 <th style="width: 140px;">Action Type</th>
                                 <th style="width: 110px;">Entity</th>
                                 <th style="width: 90px;">Target ID</th>
                                 <th>Activity Details</th>
-                                <th style="width: 120px;" class="pe-3 text-end">IP Address</th>
+                                <th style="width: 120px; text-align: right; padding-right: 18px;">IP Address</th>
                             </tr>
                         </thead>
                         <tbody>
                             <tr th:if="${#lists.isEmpty(logs)}">
-                                <td colspan="7" class="text-center text-muted py-5">
-                                    <i class="bi bi-journal-x fs-2 d-block mb-2 text-secondary"></i>
-                                    No audit log entries recorded yet.
+                                <td colspan="7">
+                                    <div class="adm-empty">
+                                        <i class="bi bi-journal-x"></i>
+                                        <p>No audit log entries recorded yet.</p>
+                                    </div>
                                 </td>
                             </tr>
                             <tr th:each="logItem : ${logs}">
                                 <!-- Timestamp -->
-                                <td class="ps-3 font-monospace text-muted small" style="white-space: nowrap;"
+                                <td class="mono" style="padding-left: 18px; white-space: nowrap;"
                                     th:text="${#temporals.format(logItem.timestamp, 'yyyy-MM-dd HH:mm:ss')}"></td>
 
                                 <!-- Actor -->
-                                <td class="fw-semibold text-dark small text-truncate" style="max-width: 190px;"
-                                    th:text="${logItem.actorEmail}" th:title="${logItem.actorEmail}">admin@nidis.gov.lk</td>
+                                <td style="max-width: 200px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                                    <span style="font-weight: 600; color: #1e293b;" th:text="${logItem.actorEmail}" th:title="${logItem.actorEmail}">admin@nidis.gov.lk</span>
+                                </td>
 
                                 <!-- Action Type -->
                                 <td>
-                                    <span th:if="${#strings.contains(logItem.action, 'APPROVE')}" class="badge badge-subtle-success px-2 py-0.5" th:text="${logItem.action}"></span>
-                                    <span th:if="${#strings.contains(logItem.action, 'REJECT')}" class="badge badge-subtle-danger px-2 py-0.5" th:text="${logItem.action}"></span>
-                                    <span th:if="${#strings.contains(logItem.action, 'CORRECTION')}" class="badge badge-subtle-warning px-2 py-0.5" th:text="${logItem.action}"></span>
-                                    <span th:if="${#strings.contains(logItem.action, 'ROLE') or #strings.contains(logItem.action, 'USER')}" class="badge badge-subtle-info px-2 py-0.5" th:text="${logItem.action}"></span>
+                                    <span th:if="${#strings.contains(logItem.action, 'APPROVE')}" class="abadge ab-ok" th:text="${logItem.action}"></span>
+                                    <span th:if="${#strings.contains(logItem.action, 'REJECT')}" class="abadge ab-no" th:text="${logItem.action}"></span>
+                                    <span th:if="${#strings.contains(logItem.action, 'CORRECTION')}" class="abadge ab-wr" th:text="${logItem.action}"></span>
+                                    <span th:if="${#strings.contains(logItem.action, 'ROLE') or #strings.contains(logItem.action, 'USER')}" class="abadge ab-in" th:text="${logItem.action}"></span>
                                     <span th:if="${!#strings.contains(logItem.action, 'APPROVE') and !#strings.contains(logItem.action, 'REJECT') and !#strings.contains(logItem.action, 'CORRECTION') and !#strings.contains(logItem.action, 'ROLE') and !#strings.contains(logItem.action, 'USER')}"
-                                          class="badge badge-subtle-secondary px-2 py-0.5" th:text="${logItem.action}"></span>
+                                          class="abadge ab-xx" th:text="${logItem.action}"></span>
                                 </td>
 
                                 <!-- Entity -->
                                 <td>
-                                    <span class="badge bg-light text-dark border small" th:text="${logItem.entityName}">NIC</span>
+                                    <span class="abadge ab-xx" th:text="${logItem.entityName}">NIC</span>
                                 </td>
 
                                 <!-- Target ID -->
                                 <td>
-                                    <span class="font-monospace fw-bold text-primary small" th:text="${logItem.entityId != null ? '#' + logItem.entityId : '-'}">#1</span>
+                                    <span class="mono fw-bold text-primary" th:text="${logItem.entityId != null ? '#' + logItem.entityId : '-'}">#1</span>
                                 </td>
 
-                                <!-- Details -->
-                                <td class="small text-muted text-break" style="max-width: 420px;"
+                                <!-- Activity Details -->
+                                <td style="max-width: 420px; word-break: break-word; font-size: 0.72rem; color: var(--body);"
                                     th:text="${logItem.details}">User action details</td>
 
-                                <!-- IP -->
-                                <td class="pe-3 font-monospace text-muted small text-end" style="white-space: nowrap;"
+                                <!-- IP Address -->
+                                <td class="mono" style="text-align: right; padding-right: 18px; white-space: nowrap;"
                                     th:text="${logItem.ipAddress}">127.0.0.1</td>
                             </tr>
                         </tbody>
                     </table>
                 </div>
             </div>
-        </div>
 
-    </main>
-</div>
+        </div><!-- /page -->
+    </div><!-- /main -->
+</div><!-- /shell -->
 
-<footer th:replace="~{fragments/footer :: footer}"></footer>
 <th:block th:replace="~{fragments/footer :: scripts}"></th:block>
 </body>
 </html>
