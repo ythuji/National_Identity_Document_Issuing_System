@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/header :: head('Payment Receipt')}"></head>
+<body class="d-flex flex-column min-vh-100">
+
+<div class="no-print">
+    <nav th:replace="~{fragments/header :: navbar}"></nav>
+</div>
+
+<main class="container py-5 flex-grow-1">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+
+            <!-- Action Bar (hidden when printing) -->
+            <div class="d-flex justify-content-between align-items-center mb-4 no-print">
+                <a th:href="@{/dashboard}" class="btn btn-outline-secondary btn-sm">
+                    <i class="bi bi-arrow-left me-1"></i>Back to Dashboard
+                </a>
+                <div class="d-flex gap-2">
+                    <a th:href="@{/payment/my-payments}" class="btn btn-outline-primary btn-sm">
+                        <i class="bi bi-list-ul me-1"></i>My Payment History
+                    </a>
+                    <button onclick="window.print()" class="btn btn-primary btn-sm">
+                        <i class="bi bi-printer-fill me-1"></i>Print / Save as PDF
+                    </button>
+                </div>
+            </div>
+
+            <!-- Printable Receipt Card -->
+            <div class="card border-0 shadow-sm p-4 p-md-5 receipt bg-white">
+                <!-- Receipt Header -->
+                <div class="text-center border-bottom pb-4 mb-4">
+                    <div class="d-inline-flex p-3 rounded-circle bg-primary bg-opacity-10 text-primary mb-2">
+                        <i class="bi bi-shield-check display-5"></i>
+                    </div>
+                    <h3 class="fw-bold text-dark mb-1">Democratic Socialist Republic of Sri Lanka</h3>
+                    <h5 class="text-secondary fw-semibold mb-1">National Identity Document Issuing System (NIDIS)</h5>
+                    <p class="text-muted small mb-0">Official Electronic Payment Receipt & Acknowledgment</p>
+                </div>
+
+                <!-- Transaction Badge -->
+                <div class="d-flex justify-content-between align-items-center bg-light p-3 rounded-3 mb-4">
+                    <div>
+                        <span class="text-muted small text-uppercase fw-semibold d-block">Transaction Reference</span>
+                        <span class="fs-5 fw-bold font-monospace text-primary" th:text="${transaction.transactionId}">TXN-20260919-89214</span>
+                    </div>
+                    <div class="text-end">
+                        <span class="badge bg-success fs-6 px-3 py-2">
+                            <i class="bi bi-check-circle-fill me-1"></i>PAID
+                        </span>
+                    </div>
+                </div>
+
+                <!-- Receipt Body Grid -->
+                <div class="row g-3 mb-4">
+                    <div class="col-sm-6">
+                        <label class="text-muted small text-uppercase fw-semibold d-block">Payer Full Name</label>
+                        <span class="fw-bold text-dark" th:text="${transaction.user.fullName}">Citizen Name</span>
+                    </div>
+                    <div class="col-sm-6">
+                        <label class="text-muted small text-uppercase fw-semibold d-block">Payer Email</label>
+                        <span class="text-dark" th:text="${transaction.user.email}">citizen@test.lk</span>
+                    </div>
+
+                    <div class="col-sm-6">
+                        <label class="text-muted small text-uppercase fw-semibold d-block">Service Category</label>
+                        <span class="fw-semibold text-dark" th:text="${transaction.applicationType}">NIC</span>
+                    </div>
+                    <div class="col-sm-6">
+                        <label class="text-muted small text-uppercase fw-semibold d-block">Application Reference No</label>
+                        <span class="fw-bold font-monospace text-dark" th:text="${transaction.applicationReference}">NIC-20260919-48192</span>
+                    </div>
+
+                    <div class="col-sm-6">
+                        <label class="text-muted small text-uppercase fw-semibold d-block">Payment Method</label>
+                        <span class="text-dark">
+                            <i class="bi bi-credit-card-2-front me-1"></i>Card ending in **** <span th:text="${transaction.cardLastFour != null ? transaction.cardLastFour : '4242'}"></span>
+                        </span>
+                    </div>
+                    <div class="col-sm-6">
+                        <label class="text-muted small text-uppercase fw-semibold d-block">Payment Timestamp</label>
+                        <span class="text-dark" th:text="${#temporals.format(transaction.paidAt != null ? transaction.paidAt : transaction.createdAt, 'yyyy-MM-dd HH:mm:ss')}">2026-09-19 11:45:00</span>
+                    </div>
+                </div>
+
+                <!-- Amount Table -->
+                <div class="table-responsive mb-4">
+                    <table class="table table-bordered align-middle">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Item Description</th>
+                                <th class="text-end" style="width: 150px;">Amount (LKR)</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>
+                                    <strong>Document Issuing Processing Fee</strong>
+                                    <div class="small text-muted" th:text="${transaction.applicationType} + ' Service — Ref: ' + ${transaction.applicationReference}"></div>
+                                </td>
+                                <td class="text-end fw-bold" th:text="${#numbers.formatDecimal(transaction.amount, 1, 'COMMA', 2, 'POINT')}">500.00</td>
+                            </tr>
+                            <tr class="table-light">
+                                <td class="text-end fw-bold fs-6">TOTAL AMOUNT PAID:</td>
+                                <td class="text-end fw-bold text-success fs-5">LKR <span th:text="${#numbers.formatDecimal(transaction.amount, 1, 'COMMA', 2, 'POINT')}">500.00</span></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Footer / Stamp Note -->
+                <div class="text-center pt-3 border-top text-muted small">
+                    <div class="mb-2">
+                        <i class="bi bi-shield-lock-fill text-success me-1"></i>
+                        This is a computer-generated official receipt. No physical signature is required.
+                    </div>
+                    <p class="mb-0">For inquiries, contact the NIDIS Support Helpdesk: support@nidis.gov.lk | Hotline: 1919</p>
+                </div>
+
+                <!-- Return to application link (hidden when printing) -->
+                <div class="text-center mt-4 no-print">
+                    <a th:if="${#strings.toString(transaction.applicationType) == 'NIC'}"
+                       th:href="@{/nic/view/{id}(id=${transaction.applicationId})}" class="btn btn-outline-info">
+                        <i class="bi bi-eye me-1"></i>Return to NIC Application Details
+                    </a>
+                    <a th:if="${#strings.toString(transaction.applicationType) == 'LICENSE'}"
+                       th:href="@{/license/view/{id}(id=${transaction.applicationId})}" class="btn btn-outline-primary">
+                        <i class="bi bi-eye me-1"></i>Return to License Application Details
+                    </a>
+                    <a th:if="${#strings.toString(transaction.applicationType) == 'PASSPORT'}"
+                       th:href="@{/passport/view/{id}(id=${transaction.applicationId})}" class="btn btn-outline-success">
+                        <i class="bi bi-eye me-1"></i>Return to Passport Application Details
+                    </a>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</main>
+
+<div class="no-print">
+    <footer th:replace="~{fragments/footer :: footer}"></footer>
+    <th:block th:replace="~{fragments/footer :: scripts}"></th:block>
+</div>
+
+</body>
+</html>
+

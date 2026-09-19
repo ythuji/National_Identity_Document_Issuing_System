@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/header :: head('Create Account')}"></head>
+<body class="d-flex flex-column min-vh-100">
+
+<nav th:replace="~{fragments/header :: navbar}"></nav>
+
+<main class="container my-auto py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-7 col-lg-6">
+            <div class="card auth-card">
+                <div class="card-header">
+                    <h4 class="mb-0 fw-bold"><i class="bi bi-person-plus-fill me-2"></i>Create an Account</h4>
+                    <p class="small mb-0 opacity-75">Register to access national identity document services</p>
+                </div>
+                <div class="card-body p-4">
+
+                    <!-- Global validation error -->
+                    <div th:if="${#fields.hasErrors('${registrationDto}')}" class="alert alert-danger" role="alert">
+                        <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                        Please correct the errors indicated below.
+                    </div>
+
+                    <form th:action="@{/register}" th:object="${registrationDto}" method="post">
+
+                        <div class="mb-3">
+                            <label for="fullName" class="form-label">Full Name</label>
+                            <input type="text" class="form-control" id="fullName" th:field="*{fullName}"
+                                   th:classappend="${#fields.hasErrors('fullName')} ? 'is-invalid' : ''"
+                                   placeholder="e.g. John Doe Perera">
+                            <div class="invalid-feedback" th:errors="*{fullName}"></div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="email" class="form-label">Email Address</label>
+                                <input type="email" class="form-control" id="email" th:field="*{email}"
+                                       th:classappend="${#fields.hasErrors('email')} ? 'is-invalid' : ''"
+                                       placeholder="name@domain.com">
+                                <div class="invalid-feedback" th:errors="*{email}"></div>
+                                <div class="form-text">OTP verification code will be sent to this email.</div>
+                            </div>
+
+                            <div class="col-md-6 mb-3">
+                                <label for="phone" class="form-label">Mobile Phone</label>
+                                <input type="tel" class="form-control" id="phone" th:field="*{phone}"
+                                       th:classappend="${#fields.hasErrors('phone')} ? 'is-invalid' : ''"
+                                       placeholder="e.g. 0771234567">
+                                <div class="invalid-feedback" th:errors="*{phone}"></div>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="nicNumber" class="form-label">National Identity Card (NIC) / Passport No</label>
+                            <input type="text" class="form-control" id="nicNumber" th:field="*{nicNumber}"
+                                   th:classappend="${#fields.hasErrors('nicNumber')} ? 'is-invalid' : ''"
+                                   placeholder="e.g. 200012345678 or 991234567V">
+                            <div class="invalid-feedback" th:errors="*{nicNumber}"></div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="password" class="form-label">Password</label>
+                                <input type="password" class="form-control" id="password" th:field="*{password}"
+                                       th:classappend="${#fields.hasErrors('password')} ? 'is-invalid' : ''"
+                                       placeholder="Min 8 characters">
+                                <div class="invalid-feedback" th:errors="*{password}"></div>
+                            </div>
+
+                            <div class="col-md-6 mb-3">
+                                <label for="confirmPassword" class="form-label">Confirm Password</label>
+                                <input type="password" class="form-control" id="confirmPassword" th:field="*{confirmPassword}"
+                                       th:classappend="${#fields.hasErrors('confirmPassword')} ? 'is-invalid' : ''"
+                                       placeholder="Re-type password">
+                                <div class="invalid-feedback" th:errors="*{confirmPassword}"></div>
+                            </div>
+                        </div>
+
+                        <div class="alert alert-info py-2 small">
+                            <i class="bi bi-info-circle me-1"></i>
+                            An email containing a 6-digit OTP will be dispatched to verify your ownership of this address before activation.
+                        </div>
+
+                        <div class="d-grid mt-4">
+                            <button type="submit" class="btn btn-primary py-2 fw-semibold">
+                                <i class="bi bi-arrow-right-circle me-2"></i>Continue to Verification
+                            </button>
+                        </div>
+                    </form>
+
+                    <hr class="my-4">
+
+                    <div class="text-center">
+                        <p class="text-muted small mb-0">
+                            Already registered?
+                            <a th:href="@{/login}" class="fw-bold text-primary text-decoration-none">Sign In Here</a>
+                        </p>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+
+<footer th:replace="~{fragments/footer :: footer}"></footer>
+<th:block th:replace="~{fragments/footer :: scripts}"></th:block>
+</body>
+</html>
+

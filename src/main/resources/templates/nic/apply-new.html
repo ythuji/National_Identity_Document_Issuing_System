@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/header :: head('New National Identity Card Application')}"></head>
+<body class="d-flex flex-column min-vh-100">
+
+<nav th:replace="~{fragments/header :: navbar}"></nav>
+
+<main class="container py-4 flex-grow-1">
+    <div class="row justify-content-center">
+        <div class="col-lg-9">
+
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <div>
+                    <h3 class="fw-bold mb-0"><i class="bi bi-person-badge me-2 text-info"></i>First-Time NIC Application (Form DRP-01)</h3>
+                    <p class="text-muted small mb-0">Department for Registration of Persons — Application for First-Time Smart NIC.</p>
+                </div>
+                <a th:href="@{/nic}" class="btn btn-outline-secondary btn-sm">
+                    <i class="bi bi-arrow-left me-1"></i>Back
+                </a>
+            </div>
+
+            <!-- Error alert -->
+            <div th:if="${errorMessage}" class="alert alert-danger alert-dismissible fade show" role="alert">
+                <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                <span th:text="${errorMessage}"></span>
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+
+            <div class="card border-0 shadow-sm">
+                <div class="card-body p-4">
+                    <form th:action="@{/nic/apply}" th:object="${nicDto}" method="post" enctype="multipart/form-data">
+                        <input type="hidden" th:field="*{id}">
+                        <input type="hidden" th:field="*{category}">
+
+                        <!-- Section 1: Bio-Data -->
+                        <h5 class="fw-bold text-primary border-bottom pb-2 mb-3">
+                            <i class="bi bi-person-lines-fill me-2"></i>1. Citizen Personal Details
+                        </h5>
+
+                        <div class="mb-3">
+                            <label for="fullName" class="form-label">Full Name (as appearing in Birth Certificate) <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control text-uppercase" id="fullName" th:field="*{fullName}"
+                                   th:classappend="${#fields.hasErrors('fullName')} ? 'is-invalid' : ''" required>
+                            <div class="invalid-feedback" th:errors="*{fullName}"></div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-4 mb-3">
+                                <label for="dateOfBirth" class="form-label">Date of Birth <span class="text-danger">*</span></label>
+                                <input type="date" class="form-control" id="dateOfBirth" th:field="*{dateOfBirth}"
+                                       th:classappend="${#fields.hasErrors('dateOfBirth')} ? 'is-invalid' : ''" required>
+                                <div class="invalid-feedback" th:errors="*{dateOfBirth}"></div>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label for="gender" class="form-label">Gender <span class="text-danger">*</span></label>
+                                <select class="form-select" id="gender" th:field="*{gender}" required>
+                                    <option value="">-- Select Gender --</option>
+                                    <option value="Male">Male</option>
+                                    <option value="Female">Female</option>
+                                    <option value="Other">Other</option>
+                                </select>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label for="civilStatus" class="form-label">Civil Status <span class="text-danger">*</span></label>
+                                <select class="form-select" id="civilStatus" th:field="*{civilStatus}" required>
+                                    <option value="">-- Select Status --</option>
+                                    <option value="Single">Single</option>
+                                    <option value="Married">Married</option>
+                                    <option value="Widowed">Widowed</option>
+                                    <option value="Divorced">Divorced</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="occupation" class="form-label">Profession / Occupation / Student</label>
+                                <input type="text" class="form-control" id="occupation" th:field="*{occupation}" placeholder="e.g. Student, Engineer">
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="phone" class="form-label">Contact Mobile Number <span class="text-danger">*</span></label>
+                                <input type="tel" class="form-control" id="phone" th:field="*{phone}" required>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="permanentAddress" class="form-label">Permanent Residential Address <span class="text-danger">*</span></label>
+                            <textarea class="form-control" id="permanentAddress" th:field="*{permanentAddress}" rows="2" required></textarea>
+                        </div>
+
+                        <!-- Section 2: Administrative Division -->
+                        <h5 class="fw-bold text-primary border-bottom pb-2 my-4">
+                            <i class="bi bi-geo-alt-fill me-2"></i>2. Administrative Division Verification
+                        </h5>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="gramaNiladhariDivision" class="form-label">Grama Niladhari (GN) Division & Number <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" id="gramaNiladhariDivision" th:field="*{gramaNiladhariDivision}" placeholder="e.g. 524A Colombo Central" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="divisionalSecretariat" class="form-label">Divisional Secretariat (DS) <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" id="divisionalSecretariat" th:field="*{divisionalSecretariat}" placeholder="e.g. Thimbirigasyaya" required>
+                            </div>
+                        </div>
+
+                        <!-- Section 3: Document Attachments -->
+                        <h5 class="fw-bold text-primary border-bottom pb-2 my-4">
+                            <i class="bi bi-cloud-arrow-up-fill me-2"></i>3. Required Supporting Documents (Stored in MS SQL)
+                        </h5>
+
+                        <div class="row g-3">
+                            <div class="col-md-4">
+                                <label class="form-label fw-semibold">ICAO Color Photo <span class="text-danger">*</span></label>
+                                <input type="file" class="form-control" name="photoFile" accept="image/*" required>
+                                <div class="form-text">Studio photo (35mm x 45mm, blue/light background)</div>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label fw-semibold">Birth Certificate Scan <span class="text-danger">*</span></label>
+                                <input type="file" class="form-control" name="birthCertFile" accept="image/*,.pdf" required>
+                                <div class="form-text">Clear certified copy / original scan</div>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label fw-semibold">Grama Niladhari Certificate <span class="text-danger">*</span></label>
+                                <input type="file" class="form-control" name="addressProofFile" accept="image/*,.pdf" required>
+                                <div class="form-text">Residence proof certified by GN officer</div>
+                            </div>
+                        </div>
+
+                        <!-- Fee Notice -->
+                        <div class="alert alert-info d-flex align-items-center mt-4 mb-0">
+                            <i class="bi bi-info-circle-fill fs-4 me-3"></i>
+                            <div>
+                                <strong>Application Processing Fee: LKR 500.00</strong>
+                                <div class="small">Payment can be completed instantly via the online payment gateway after submission.</div>
+                            </div>
+                        </div>
+
+                        <!-- Actions -->
+                        <div class="d-flex justify-content-between align-items-center mt-4 pt-3 border-top">
+                            <button type="submit" th:formaction="@{/nic/draft}" class="btn btn-outline-secondary">
+                                <i class="bi bi-bookmark me-1"></i>Save as Draft
+                            </button>
+                            <button type="submit" class="btn btn-info text-dark px-4 py-2 fw-semibold">
+                                <i class="bi bi-send-check-fill me-2"></i>Submit & Proceed to Payment
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</main>
+
+<footer th:replace="~{fragments/footer :: footer}"></footer>
+<th:block th:replace="~{fragments/footer :: scripts}"></th:block>
+</body>
+</html>
+

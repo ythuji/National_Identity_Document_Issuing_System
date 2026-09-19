@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/header :: head('Lost Driving License Replacement (F3)')}"></head>
+<body class="d-flex flex-column min-vh-100">
+
+<nav th:replace="~{fragments/header :: navbar}"></nav>
+
+<main class="container py-4 flex-grow-1">
+    <div class="row justify-content-center">
+        <div class="col-lg-9">
+
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <div>
+                    <h3 class="fw-bold mb-0"><i class="bi bi-shield-exclamation me-2 text-warning"></i>Lost License Replacement (Form F3)</h3>
+                    <p class="text-muted small mb-0">Apply for a duplicate driving license. Police incident entry is mandatory.</p>
+                </div>
+                <a th:href="@{/license}" class="btn btn-outline-secondary btn-sm">
+                    <i class="bi bi-arrow-left me-1"></i>Back
+                </a>
+            </div>
+
+            <div class="card border-0 shadow-sm">
+                <div class="card-body p-4">
+                    <form th:action="@{/license/apply}" th:object="${licenseDto}" method="post" enctype="multipart/form-data">
+                        <input type="hidden" th:field="*{id}">
+                        <input type="hidden" th:field="*{category}">
+
+                        <!-- Police Incident Details -->
+                        <div class="card bg-warning bg-opacity-10 border-warning p-3 mb-4">
+                            <h6 class="fw-bold text-dark mb-2"><i class="bi bi-shield-shaded me-1"></i>Police Station Incident Record (Mandatory)</h6>
+                            <div class="row g-2">
+                                <div class="col-md-6">
+                                    <label for="policeReportRef" class="form-label small fw-semibold">Police Report Entry Number <span class="text-danger">*</span></label>
+                                    <input type="text" class="form-control" id="policeReportRef" th:field="*{policeReportRef}"
+                                           placeholder="e.g. POL/COL/2026/9821" required>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label small fw-semibold">Upload Police Certificate / Extract <span class="text-danger">*</span></label>
+                                    <input type="file" class="form-control" name="policeReportFile" accept="image/*,.pdf" required>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Personal Details -->
+                        <h5 class="fw-bold text-primary border-bottom pb-2 mb-3">
+                            <i class="bi bi-person-lines-fill me-2"></i>Applicant Details
+                        </h5>
+
+                        <div class="mb-3">
+                            <label for="fullName" class="form-label">Full Name</label>
+                            <input type="text" class="form-control" id="fullName" th:field="*{fullName}" required>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="existingLicenseNumber" class="form-label">Lost Driving License Number (if known)</label>
+                                <input type="text" class="form-control" id="existingLicenseNumber" th:field="*{existingLicenseNumber}" placeholder="e.g. B8765432">
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="dateOfBirth" class="form-label">Date of Birth</label>
+                                <input type="date" class="form-control" id="dateOfBirth" th:field="*{dateOfBirth}" required>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="phone" class="form-label">Mobile Contact</label>
+                                <input type="tel" class="form-control" id="phone" th:field="*{phone}" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="vehicleClass" class="form-label">Vehicle Classes</label>
+                                <input type="text" class="form-control" id="vehicleClass" th:field="*{vehicleClass}" placeholder="e.g. B, B1" required>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="address" class="form-label">Permanent Address</label>
+                            <textarea class="form-control" id="address" th:field="*{address}" rows="2" required></textarea>
+                        </div>
+
+                        <!-- Attachments -->
+                        <h5 class="fw-bold text-primary border-bottom pb-2 my-4">
+                            <i class="bi bi-cloud-arrow-up-fill me-2"></i>Identification Documents
+                        </h5>
+
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold">Recent Color Photograph <span class="text-danger">*</span></label>
+                                <input type="file" class="form-control" name="photoFile" accept="image/*" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold">National Identity Card Copy <span class="text-danger">*</span></label>
+                                <input type="file" class="form-control" name="idProofFile" accept="image/*,.pdf" required>
+                            </div>
+                        </div>
+
+                        <!-- Actions -->
+                        <div class="d-flex justify-content-between align-items-center mt-5 pt-3 border-top">
+                            <button type="submit" th:formaction="@{/license/draft}" class="btn btn-outline-secondary">
+                                <i class="bi bi-bookmark me-1"></i>Save as Draft
+                            </button>
+                            <button type="submit" class="btn btn-warning px-4 py-2 fw-semibold text-dark">
+                                <i class="bi bi-send-check-fill me-2"></i>Submit Duplicate Application
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</main>
+
+<footer th:replace="~{fragments/footer :: footer}"></footer>
+<th:block th:replace="~{fragments/footer :: scripts}"></th:block>
+</body>
+</html>
+

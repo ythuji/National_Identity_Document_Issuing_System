@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/header :: head('Lost NIC Replacement Application')}"></head>
+<body class="d-flex flex-column min-vh-100">
+
+<nav th:replace="~{fragments/header :: navbar}"></nav>
+
+<main class="container py-4 flex-grow-1">
+    <div class="row justify-content-center">
+        <div class="col-lg-9">
+
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <div>
+                    <h3 class="fw-bold mb-0"><i class="bi bi-shield-exclamation me-2 text-danger"></i>Lost Smart NIC Replacement</h3>
+                    <p class="text-muted small mb-0">Department for Registration of Persons — Duplicate NIC Issuance.</p>
+                </div>
+                <a th:href="@{/nic}" class="btn btn-outline-secondary btn-sm">
+                    <i class="bi bi-arrow-left me-1"></i>Back
+                </a>
+            </div>
+
+            <!-- Pre-fill / Auto-lookup card -->
+            <div class="card mb-4 border-danger shadow-sm bg-light">
+                <div class="card-body">
+                    <h6 class="fw-bold text-danger mb-2"><i class="bi bi-search me-2"></i>Auto-Fill from Lost NIC Record</h6>
+                    <div class="row g-2 align-items-center">
+                        <div class="col-md-8">
+                            <input type="text" class="form-control" id="lookupNicNumber" placeholder="Enter lost NIC number (e.g. 199512345678 or 951234567V)">
+                        </div>
+                        <div class="col-md-4">
+                            <button type="button" class="btn btn-outline-danger w-100" id="btnLookup">
+                                <i class="bi bi-magic me-1"></i>Lookup & Fill
+                            </button>
+                        </div>
+                    </div>
+                    <div id="lookupMessage" class="small mt-2" style="display:none;"></div>
+                </div>
+            </div>
+
+            <!-- Error alert -->
+            <div th:if="${errorMessage}" class="alert alert-danger alert-dismissible fade show" role="alert">
+                <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                <span th:text="${errorMessage}"></span>
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+
+            <div class="card border-0 shadow-sm">
+                <div class="card-body p-4">
+                    <form th:action="@{/nic/apply}" th:object="${nicDto}" method="post" enctype="multipart/form-data">
+                        <input type="hidden" th:field="*{id}">
+                        <input type="hidden" th:field="*{category}">
+
+                        <!-- Section 1: Lost NIC and Police Entry Reference -->
+                        <h5 class="fw-bold text-danger border-bottom pb-2 mb-3">
+                            <i class="bi bi-file-earmark-lock-fill me-2"></i>1. Lost NIC & Police Incident Information
+                        </h5>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="existingNicNumber" class="form-label">Lost NIC Number <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" id="existingNicNumber" th:field="*{existingNicNumber}"
+                                       th:classappend="${#fields.hasErrors('existingNicNumber')} ? 'is-invalid' : ''" required>
+                                <div class="invalid-feedback" th:errors="*{existingNicNumber}"></div>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="policeReportRef" class="form-label">Police Entry / Incident Reference No <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" id="policeReportRef" th:field="*{policeReportRef}"
+                                       placeholder="e.g. CIB-2026/8941" required>
+                            </div>
+                        </div>
+
+                        <!-- Section 2: Bio-Data -->
+                        <h5 class="fw-bold text-danger border-bottom pb-2 my-4">
+                            <i class="bi bi-person-lines-fill me-2"></i>2. Personal Bio-Data
+                        </h5>
+
+                        <div class="mb-3">
+                            <label for="fullName" class="form-label">Full Name <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control text-uppercase" id="fullName" th:field="*{fullName}"
+                                   th:classappend="${#fields.hasErrors('fullName')} ? 'is-invalid' : ''" required>
+                            <div class="invalid-feedback" th:errors="*{fullName}"></div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-4 mb-3">
+                                <label for="dateOfBirth" class="form-label">Date of Birth <span class="text-danger">*</span></label>
+                                <input type="date" class="form-control" id="dateOfBirth" th:field="*{dateOfBirth}"
+                                       th:classappend="${#fields.hasErrors('dateOfBirth')} ? 'is-invalid' : ''" required>
+                                <div class="invalid-feedback" th:errors="*{dateOfBirth}"></div>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label for="gender" class="form-label">Gender <span class="text-danger">*</span></label>
+                                <select class="form-select" id="gender" th:field="*{gender}" required>
+                                    <option value="">-- Select Gender --</option>
+                                    <option value="Male">Male</option>
+                                    <option value="Female">Female</option>
+                                    <option value="Other">Other</option>
+                                </select>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label for="civilStatus" class="form-label">Civil Status <span class="text-danger">*</span></label>
+                                <select class="form-select" id="civilStatus" th:field="*{civilStatus}" required>
+                                    <option value="">-- Select Status --</option>
+                                    <option value="Single">Single</option>
+                                    <option value="Married">Married</option>
+                                    <option value="Widowed">Widowed</option>
+                                    <option value="Divorced">Divorced</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="occupation" class="form-label">Profession / Occupation</label>
+                                <input type="text" class="form-control" id="occupation" th:field="*{occupation}">
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="phone" class="form-label">Contact Mobile <span class="text-danger">*</span></label>
+                                <input type="tel" class="form-control" id="phone" th:field="*{phone}" required>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="permanentAddress" class="form-label">Permanent Address <span class="text-danger">*</span></label>
+                            <textarea class="form-control" id="permanentAddress" th:field="*{permanentAddress}" rows="2" required></textarea>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="gramaNiladhariDivision" class="form-label">Grama Niladhari Division <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" id="gramaNiladhariDivision" th:field="*{gramaNiladhariDivision}" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="divisionalSecretariat" class="form-label">Divisional Secretariat <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" id="divisionalSecretariat" th:field="*{divisionalSecretariat}" required>
+                            </div>
+                        </div>
+
+                        <!-- Section 3: Document Attachments -->
+                        <h5 class="fw-bold text-danger border-bottom pb-2 my-4">
+                            <i class="bi bi-cloud-arrow-up-fill me-2"></i>3. Required Supporting Documents (Stored in MS SQL)
+                        </h5>
+
+                        <div class="row g-3">
+                            <div class="col-md-4">
+                                <label class="form-label fw-semibold">Police Report / Entry Copy <span class="text-danger">*</span></label>
+                                <input type="file" class="form-control" name="policeReportFile" accept="image/*,.pdf" required>
+                                <div class="form-text">Certified police extract of lost NIC</div>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label fw-semibold">Recent Studio Photo <span class="text-danger">*</span></label>
+                                <input type="file" class="form-control" name="photoFile" accept="image/*" required>
+                                <div class="form-text">ICAO 35mm x 45mm standard photo</div>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label fw-semibold">Birth Certificate Scan <span class="text-danger">*</span></label>
+                                <input type="file" class="form-control" name="birthCertFile" accept="image/*,.pdf" required>
+                                <div class="form-text">Certified copy of birth certificate</div>
+                            </div>
+                        </div>
+
+                        <!-- Fee Notice -->
+                        <div class="alert alert-danger d-flex align-items-center mt-4 mb-0">
+                            <i class="bi bi-info-circle-fill fs-4 me-3"></i>
+                            <div>
+                                <strong>Duplicate NIC Replacement Fee: LKR 1,000.00</strong>
+                                <div class="small">After submitting, you can proceed directly to the secure payment portal.</div>
+                            </div>
+                        </div>
+
+                        <!-- Actions -->
+                        <div class="d-flex justify-content-between align-items-center mt-4 pt-3 border-top">
+                            <button type="submit" th:formaction="@{/nic/draft}" class="btn btn-outline-secondary">
+                                <i class="bi bi-bookmark me-1"></i>Save as Draft
+                            </button>
+                            <button type="submit" class="btn btn-danger px-4 py-2 fw-semibold">
+                                <i class="bi bi-send-check-fill me-2"></i>Submit & Pay Fee
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</main>
+
+<footer th:replace="~{fragments/footer :: footer}"></footer>
+<th:block th:replace="~{fragments/footer :: scripts}"></th:block>
+
+<script>
+document.getElementById('btnLookup').addEventListener('click', function() {
+    const nic = document.getElementById('lookupNicNumber').value.trim();
+    const msg = document.getElementById('lookupMessage');
+    if (!nic) {
+        msg.style.display = 'block';
+        msg.className = 'small text-danger mt-2';
+        msg.textContent = 'Please enter an NIC number first.';
+        return;
+    }
+
+    fetch('/nic/prefill?nicNumber=' + encodeURIComponent(nic))
+        .then(res => {
+            if (!res.ok) throw new Error('No previous record found for this NIC.');
+            return res.json();
+        })
+        .then(data => {
+            document.getElementById('existingNicNumber').value = data.existingNicNumber || nic;
+            document.getElementById('fullName').value = data.fullName || '';
+            document.getElementById('dateOfBirth').value = data.dateOfBirth || '';
+            document.getElementById('gender').value = data.gender || '';
+            document.getElementById('civilStatus').value = data.civilStatus || '';
+            document.getElementById('occupation').value = data.occupation || '';
+            document.getElementById('phone').value = data.phone || '';
+            document.getElementById('permanentAddress').value = data.permanentAddress || '';
+            document.getElementById('gramaNiladhariDivision').value = data.gramaNiladhariDivision || '';
+            document.getElementById('divisionalSecretariat').value = data.divisionalSecretariat || '';
+
+            msg.style.display = 'block';
+            msg.className = 'small text-success mt-2';
+            msg.textContent = 'Record found! Details auto-filled successfully.';
+        })
+        .catch(err => {
+            msg.style.display = 'block';
+            msg.className = 'small text-warning mt-2';
+            msg.textContent = err.message + ' You can enter details manually.';
+        });
+});
+</script>
+
+</body>
+</html>
+

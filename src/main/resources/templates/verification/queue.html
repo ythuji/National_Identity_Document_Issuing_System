@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head th:replace="~{fragments/header :: head('Verification Queue')}"></head>
+<body class="d-flex flex-column min-vh-100">
+
+<nav th:replace="~{fragments/header :: navbar}"></nav>
+
+<!-- Admin Layout with Sidebar (When Logged in as SUPER_ADMIN) -->
+<div class="admin-layout" sec:authorize="hasAuthority('SUPER_ADMIN')">
+    <aside th:replace="~{fragments/sidebar :: sidebar('queue')}"></aside>
+    <main class="admin-content">
+        <div th:replace="~{::queueBody}"></div>
+    </main>
+</div>
+
+<!-- Officer Layout Full-Width (When Logged in as Officer / Non-Admin) -->
+<main class="container-fluid px-lg-4 py-3 flex-grow-1" sec:authorize="!hasAuthority('SUPER_ADMIN')">
+    <div th:replace="~{::queueBody}"></div>
+</main>
+
+<th:block th:if="${false}">
+<div th:fragment="queueBody">
+
+    <!-- Header Title Bar -->
+    <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+        <div>
+            <div class="d-flex align-items-center gap-2 mb-1">
+                <span class="badge badge-subtle-primary px-2 py-0.5" style="font-size: 0.65rem;">VERIFICATION DESK</span>
+                <h4 class="fw-bold mb-0 text-dark">Identity Document Verification Queue</h4>
+            </div>
+            <p class="text-muted small mb-0">Cross-departmental application assessment, biometrics verification, and approval workflow.</p>
+        </div>
+        <div class="d-flex gap-2">
+            <a sec:authorize="hasAuthority('SUPER_ADMIN')" th:href="@{/admin/dashboard}" class="btn btn-outline-secondary btn-sm">
+                <i class="bi bi-speedometer2 me-1"></i>Admin Dashboard
+            </a>
+            <a th:href="@{/verification/queue}" class="btn btn-primary btn-sm">
+                <i class="bi bi-arrow-clockwise me-1"></i>Refresh Queue
+            </a>
+        </div>
+    </div>
+
+    <!-- Alert Messages -->
+    <div th:if="${successMessage}" class="alert alert-success alert-dismissible fade show py-2.5 px-3 small" role="alert">
+        <i class="bi bi-check-circle-fill me-1.5"></i>
+        <span th:text="${successMessage}"></span>
+        <button type="button" class="btn-close py-2.5" data-bs-dismiss="alert"></button>
+    </div>
+    <div th:if="${errorMessage}" class="alert alert-danger alert-dismissible fade show py-2.5 px-3 small" role="alert">
+        <i class="bi bi-exclamation-triangle-fill me-1.5"></i>
+        <span th:text="${errorMessage}"></span>
+        <button type="button" class="btn-close py-2.5" data-bs-dismiss="alert"></button>
+    </div>
+
+    <!-- Compact Service Tabs -->
+    <ul class="nav nav-pills mb-3 gap-1.5 bg-white p-1.5 rounded border shadow-sm">
+        <li class="nav-item">
+            <a class="nav-link py-1.5 px-3 small" th:classappend="${currentService == 'ALL' ? 'active' : ''}"
+               th:href="@{/verification/queue(service='ALL', status=${currentStatus}, search=${searchQuery})}">
+                <i class="bi bi-grid-fill me-1"></i>All Services
+                <span class="badge bg-light text-dark ms-1 rounded-pill" th:text="${countAll}">0</span>
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link py-1.5 px-3 small" th:classappend="${currentService == 'LICENSE' ? 'active' : ''}"
+               th:href="@{/verification/queue(service='LICENSE', status=${currentStatus}, search=${searchQuery})}">
+                <i class="bi bi-car-front me-1"></i>Driving License
+                <span class="badge bg-light text-dark ms-1 rounded-pill" th:text="${countLicense}">0</span>
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link py-1.5 px-3 small" th:classappend="${currentService == 'PASSPORT' ? 'active' : ''}"
+               th:href="@{/verification/queue(service='PASSPORT', status=${currentStatus}, search=${searchQuery})}">
+                <i class="bi bi-globe me-1"></i>Passport Services
+                <span class="badge bg-light text-dark ms-1 rounded-pill" th:text="${countPassport}">0</span>
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link py-1.5 px-3 small" th:classappend="${currentService == 'NIC' ? 'active' : ''}"
+               th:href="@{/verification/queue(service='NIC', status=${currentStatus}, search=${searchQuery})}">
+                <i class="bi bi-person-badge me-1"></i>Smart NIC
+                <span class="badge bg-light text-dark ms-1 rounded-pill" th:text="${countNic}">0</span>
+            </a>
+        </li>
+    </ul>
+
+    <!-- Filter & Search Toolbar -->
+    <div class="card border-0 shadow-sm mb-3">
+        <div class="card-body p-2.5">
+            <form th:action="@{/verification/queue}" method="get" class="row g-2 align-items-center">
+                <input type="hidden" name="service" th:value="${currentService}">
+
+                <div class="col-md-3">
+                    <select name="status" class="form-select form-select-sm" onchange="this.form.submit()">
+                        <option value="ALL" th:selected="${currentStatus == 'ALL'}">All Statuses</option>
+                        <option value="SUBMITTED" th:selected="${currentStatus == 'SUBMITTED'}">Submitted</option>
+                        <option value="UNDER_REVIEW" th:selected="${currentStatus == 'UNDER_REVIEW'}">Under Review</option>
+                        <option value="PENDING_PAYMENT" th:selected="${currentStatus == 'PENDING_PAYMENT'}">Pending Payment</option>
+                        <option value="APPROVED" th:selected="${currentStatus == 'APPROVED'}">Approved</option>
+                        <option value="REJECTED" th:selected="${currentStatus == 'REJECTED'}">Rejected</option>
+                        <option value="PENDING_CORRECTION" th:selected="${currentStatus == 'PENDING_CORRECTION'}">Pending Correction</option>
+                    </select>
+                </div>
+
+                <div class="col-md-7">
+                    <div class="input-group input-group-sm">
+                        <span class="input-group-text bg-white border-end-0"><i class="bi bi-search text-muted"></i></span>
+                        <input type="text" name="search" class="form-control border-start-0"
+                               placeholder="Search Reference No, Applicant Name, Email, or NIC..."
+                               th:value="${searchQuery}">
+                    </div>
+                </div>
+
+                <div class="col-md-2">
+                    <button type="submit" class="btn btn-primary btn-sm w-100">
+                        <i class="bi bi-funnel me-1"></i>Filter
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Applications Queue Table -->
+    <div class="card border-0 shadow-sm">
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-admin align-middle mb-0">
+                    <thead>
+                        <tr>
+                            <th style="width: 140px;" class="ps-3">Reference No</th>
+                            <th style="width: 130px;">Service</th>
+                            <th style="width: 85px;">Category</th>
+                            <th style="min-width: 170px;">Applicant</th>
+                            <th style="width: 120px;">NIC / ID</th>
+                            <th style="width: 85px;">Payment</th>
+                            <th style="width: 130px;">Status</th>
+                            <th style="width: 120px;">Submitted</th>
+                            <th style="width: 95px;" class="text-end pe-3">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:if="${#lists.isEmpty(items)}">
+                            <td colspan="9" class="text-center text-muted py-5">
+                                <i class="bi bi-check2-all fs-2 d-block mb-2 text-success"></i>
+                                No applications match the selected queue criteria.
+                            </td>
+                        </tr>
+                        <tr th:each="item : ${items}">
+                            <!-- Ref No -->
+                            <td class="ps-3 fw-bold font-monospace small" style="white-space: nowrap;">
+                                <a th:href="@{${item.reviewUrl}}" th:text="${item.referenceNumber}" class="text-decoration-none text-primary"></a>
+                            </td>
+
+                            <!-- Service -->
+                            <td>
+                                <span th:if="${#strings.toString(item.serviceType) == 'LICENSE'}" class="badge badge-subtle-primary px-2 py-0.5" style="font-size: 0.72rem;">
+                                    <i class="bi bi-car-front me-1"></i>License
+                                </span>
+                                <span th:if="${#strings.toString(item.serviceType) == 'PASSPORT'}" class="badge badge-subtle-success px-2 py-0.5" style="font-size: 0.72rem;">
+                                    <i class="bi bi-globe me-1"></i>Passport
+                                </span>
+                                <span th:if="${#strings.toString(item.serviceType) == 'NIC'}" class="badge badge-subtle-info px-2 py-0.5" style="font-size: 0.72rem;">
+                                    <i class="bi bi-person-badge me-1"></i>NIC
+                                </span>
+                            </td>
+
+                            <!-- Category -->
+                            <td>
+                                <span class="badge bg-light text-dark border small px-2 py-0.5" th:text="${item.category}">NEW</span>
+                            </td>
+
+                            <!-- Applicant -->
+                            <td>
+                                <div class="text-truncate" style="max-width: 190px;">
+                                    <div class="fw-bold text-dark small text-truncate" th:text="${item.applicantName}">Applicant Name</div>
+                                    <div class="text-muted small text-truncate" style="font-size: 0.75rem;" th:text="${item.applicantEmail}">email@domain.lk</div>
+                                </div>
+                            </td>
+
+                            <!-- NIC -->
+                            <td class="font-monospace small" style="white-space: nowrap;"
+                                th:text="${item.applicantNic != null ? item.applicantNic : 'N/A'}"></td>
+
+                            <!-- Payment -->
+                            <td>
+                                <span th:if="${#strings.toString(item.paymentStatus) == 'PAID'}" class="badge badge-subtle-success px-2 py-0.5" style="font-size: 0.72rem;">
+                                    <i class="bi bi-check me-0.5"></i>Paid
+                                </span>
+                                <span th:if="${#strings.toString(item.paymentStatus) == 'PENDING'}" class="badge badge-subtle-warning px-2 py-0.5" style="font-size: 0.72rem;">
+                                    Pending
+                                </span>
+                                <span th:if="${#strings.toString(item.paymentStatus) == 'FAILED'}" class="badge badge-subtle-danger px-2 py-0.5" style="font-size: 0.72rem;">
+                                    Failed
+                                </span>
+                            </td>
+
+                            <!-- Status -->
+                            <td>
+                                <span th:if="${#strings.toString(item.status) == 'SUBMITTED'}" class="badge badge-subtle-info px-2 py-0.5" style="font-size: 0.72rem;">Submitted</span>
+                                <span th:if="${#strings.toString(item.status) == 'UNDER_REVIEW'}" class="badge badge-subtle-primary px-2 py-0.5" style="font-size: 0.72rem;">Under Review</span>
+                                <span th:if="${#strings.toString(item.status) == 'PENDING_PAYMENT'}" class="badge badge-subtle-warning px-2 py-0.5" style="font-size: 0.72rem;">Pending Pay</span>
+                                <span th:if="${#strings.toString(item.status) == 'APPROVED'}" class="badge badge-subtle-success px-2 py-0.5" style="font-size: 0.72rem;">Approved</span>
+                                <span th:if="${#strings.toString(item.status) == 'PAYMENT_VERIFIED'}" class="badge badge-subtle-info px-2 py-0.5" style="font-size: 0.72rem;">Payment Verified</span>
+                                <span th:if="${#strings.toString(item.status) == 'SHIPPED'}" class="badge badge-subtle-primary px-2 py-0.5" style="font-size: 0.72rem;">Shipped</span>
+                                <span th:if="${#strings.toString(item.status) == 'RECEIVED'}" class="badge badge-subtle-success px-2 py-0.5" style="font-size: 0.72rem;">Received</span>
+                                <span th:if="${#strings.toString(item.status) == 'REJECTED'}" class="badge badge-subtle-danger px-2 py-0.5" style="font-size: 0.72rem;">Rejected</span>
+                                <span th:if="${#strings.toString(item.status) == 'PENDING_CORRECTION'}" class="badge badge-subtle-warning px-2 py-0.5" style="font-size: 0.72rem;">Correction Req</span>
+                            </td>
+
+                            <!-- Submitted Date -->
+                            <td class="font-monospace text-muted small" style="white-space: nowrap;"
+                                th:text="${#temporals.format(item.createdAt, 'yyyy-MM-dd HH:mm')}"></td>
+
+                            <!-- Action -->
+                            <td class="text-end pe-3">
+                                <a th:href="@{${item.reviewUrl}}" class="btn btn-sm btn-primary py-1 px-2.5">
+                                    <i class="bi bi-clipboard-check me-1"></i>Review
+                                </a>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+</div>
+</th:block>
+
+<footer th:replace="~{fragments/footer :: footer}"></footer>
+<th:block th:replace="~{fragments/footer :: scripts}"></th:block>
+</body>
+</html>

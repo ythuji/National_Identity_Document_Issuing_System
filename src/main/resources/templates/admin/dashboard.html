@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head th:replace="~{fragments/header :: head('Admin Dashboard')}"></head>
+<body class="d-flex flex-column min-vh-100">
+
+<nav th:replace="~{fragments/header :: navbar}"></nav>
+
+<!-- Admin Unified Layout -->
+<div class="admin-layout">
+    <!-- Sidebar -->
+    <aside th:replace="~{fragments/sidebar :: sidebar('dashboard')}"></aside>
+
+    <!-- Main Content Area -->
+    <main class="admin-content">
+
+        <!-- Compact Welcome Header Banner -->
+        <div class="card mb-4 text-white border-0 shadow-sm" style="background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);">
+            <div class="card-body py-3 px-4 d-flex justify-content-between align-items-center flex-wrap gap-2">
+                <div>
+                    <div class="d-flex align-items-center gap-2 mb-1">
+                        <span class="badge badge-subtle-danger px-2 py-0.5" style="font-size: 0.65rem;">CONTROL CENTER</span>
+                        <h4 class="fw-bold mb-0 text-white">System Administration Portal</h4>
+                    </div>
+                    <p class="mb-0 text-white-50 small">
+                        Logged in as: <span sec:authentication="name" class="text-white fw-semibold"></span> | System Health: <span class="badge bg-success bg-opacity-25 text-success border border-success border-opacity-50 small">● Operational</span>
+                    </p>
+                </div>
+                <div class="d-flex gap-2">
+                    <a th:href="@{/admin/users}" class="btn btn-outline-light btn-sm">
+                        <i class="bi bi-people me-1"></i>Manage Users
+                    </a>
+                    <a th:href="@{/verification/queue}" class="btn btn-primary btn-sm">
+                        <i class="bi bi-clipboard-check me-1"></i>Verification Queue
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Metric Summary KPI Cards (Row of 4) -->
+        <div class="row g-3 mb-4">
+            <!-- Total Users -->
+            <div class="col-sm-6 col-xl-3">
+                <div class="kpi-card">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <span class="kpi-label">TOTAL USERS</span>
+                        <div class="kpi-icon-box bg-primary bg-opacity-10 text-primary">
+                            <i class="bi bi-people-fill"></i>
+                        </div>
+                    </div>
+                    <div>
+                        <div class="kpi-value" th:text="${totalUsers}">0</div>
+                        <div class="small text-muted">
+                            <span class="text-success fw-semibold" th:text="${activeUsers}">0</span> active accounts
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Officers & Staff -->
+            <div class="col-sm-6 col-xl-3">
+                <div class="kpi-card">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <span class="kpi-label">OFFICERS & STAFF</span>
+                        <div class="kpi-icon-box bg-info bg-opacity-10 text-info">
+                            <i class="bi bi-person-badge-fill"></i>
+                        </div>
+                    </div>
+                    <div>
+                        <div class="kpi-value" th:text="${totalOfficers}">0</div>
+                        <div class="small text-muted">
+                            <span class="text-primary fw-semibold" th:text="${totalApplicants}">0</span> registered citizens
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Total Applications -->
+            <div class="col-sm-6 col-xl-3">
+                <div class="kpi-card">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <span class="kpi-label">TOTAL APPLICATIONS</span>
+                        <div class="kpi-icon-box bg-warning bg-opacity-10 text-warning">
+                            <i class="bi bi-files"></i>
+                        </div>
+                    </div>
+                    <div>
+                        <div class="kpi-value" th:text="${totalApplications}">0</div>
+                        <div class="small text-muted">
+                            <span class="text-warning fw-semibold" th:text="${pendingCount}">0</span> pending review
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Revenue Collected -->
+            <div class="col-sm-6 col-xl-3">
+                <div class="kpi-card">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <span class="kpi-label">REVENUE COLLECTED</span>
+                        <div class="kpi-icon-box bg-success bg-opacity-10 text-success">
+                            <i class="bi bi-cash-stack"></i>
+                        </div>
+                    </div>
+                    <div>
+                        <div class="kpi-value text-success">
+                            <span style="font-size: 1rem; font-weight: 600;">LKR</span> <span th:text="${totalRevenue != null ? #numbers.formatDecimal(totalRevenue, 1, 2) : '0.00'}">0.00</span>
+                        </div>
+                        <div class="small text-muted">
+                            <span th:text="${totalPayments}">0</span> transactions recorded
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Services & Status Overview (Balanced 2-column layout) -->
+        <div class="row g-4 mb-4">
+            <!-- Applications by Service -->
+            <div class="col-lg-6">
+                <div class="card h-100 shadow-sm border-0">
+                    <div class="card-header py-2.5 px-3 bg-white d-flex justify-content-between align-items-center">
+                        <span class="fw-bold text-dark small text-uppercase" style="letter-spacing: 0.5px;">
+                            <i class="bi bi-pie-chart-fill me-1.5 text-primary"></i>Applications by Service
+                        </span>
+                        <span class="badge badge-subtle-primary" th:text="${totalApplications} + ' Total'">0 Total</span>
+                    </div>
+                    <div class="card-body p-3">
+                        <div class="d-flex flex-column gap-2.5">
+                            <!-- Driving License -->
+                            <div class="d-flex justify-content-between align-items-center p-2.5 bg-light rounded border border-light">
+                                <div class="d-flex align-items-center">
+                                    <div class="bg-primary text-white rounded p-2 me-2.5 d-flex align-items-center justify-content-center" style="width: 34px; height: 34px;">
+                                        <i class="bi bi-car-front fs-6"></i>
+                                    </div>
+                                    <div>
+                                        <div class="fw-bold text-dark small">Driver's License</div>
+                                        <div class="text-muted" style="font-size: 0.75rem;">New, Renewal & Lost replacements</div>
+                                    </div>
+                                </div>
+                                <span class="badge bg-primary px-2.5 py-1" th:text="${totalLicenseApps}">0</span>
+                            </div>
+
+                            <!-- Passport -->
+                            <div class="d-flex justify-content-between align-items-center p-2.5 bg-light rounded border border-light">
+                                <div class="d-flex align-items-center">
+                                    <div class="bg-success text-white rounded p-2 me-2.5 d-flex align-items-center justify-content-center" style="width: 34px; height: 34px;">
+                                        <i class="bi bi-globe fs-6"></i>
+                                    </div>
+                                    <div>
+                                        <div class="fw-bold text-dark small">Passport Services</div>
+                                        <div class="text-muted" style="font-size: 0.75rem;">Immigration & Emigration applications</div>
+                                    </div>
+                                </div>
+                                <span class="badge bg-success px-2.5 py-1" th:text="${totalPassportApps}">0</span>
+                            </div>
+
+                            <!-- NIC -->
+                            <div class="d-flex justify-content-between align-items-center p-2.5 bg-light rounded border border-light">
+                                <div class="d-flex align-items-center">
+                                    <div class="bg-info text-white rounded p-2 me-2.5 d-flex align-items-center justify-content-center" style="width: 34px; height: 34px;">
+                                        <i class="bi bi-person-badge fs-6"></i>
+                                    </div>
+                                    <div>
+                                        <div class="fw-bold text-dark small">Smart NIC</div>
+                                        <div class="text-muted" style="font-size: 0.75rem;">Department for Registration of Persons</div>
+                                    </div>
+                                </div>
+                                <span class="badge bg-info text-dark px-2.5 py-1" th:text="${totalNicApps}">0</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Workflow Processing Status -->
+            <div class="col-lg-6">
+                <div class="card h-100 shadow-sm border-0">
+                    <div class="card-header py-2.5 px-3 bg-white d-flex justify-content-between align-items-center">
+                        <span class="fw-bold text-dark small text-uppercase" style="letter-spacing: 0.5px;">
+                            <i class="bi bi-bar-chart-fill me-1.5 text-warning"></i>Workflow Processing Status
+                        </span>
+                        <a th:href="@{/verification/queue}" class="btn btn-outline-primary btn-sm py-0 px-2" style="font-size: 0.75rem;">
+                            Open Queue <i class="bi bi-arrow-right"></i>
+                        </a>
+                    </div>
+                    <div class="card-body p-3">
+                        <div class="d-flex flex-column gap-2.5">
+                            <!-- Pending / Review -->
+                            <div class="d-flex justify-content-between align-items-center p-2.5 rounded border border-warning-subtle bg-warning bg-opacity-10">
+                                <div>
+                                    <div class="fw-bold text-dark small">Under Review / Pending</div>
+                                    <div class="text-muted" style="font-size: 0.75rem;">Awaiting officer verification & action</div>
+                                </div>
+                                <span class="fw-bold fs-6 text-warning" th:text="${pendingCount}">0</span>
+                            </div>
+
+                            <!-- Approved -->
+                            <div class="d-flex justify-content-between align-items-center p-2.5 rounded border border-success-subtle bg-success bg-opacity-10">
+                                <div>
+                                    <div class="fw-bold text-dark small">Approved & Issued</div>
+                                    <div class="text-muted" style="font-size: 0.75rem;">Verified, authorized, and dispatched</div>
+                                </div>
+                                <span class="fw-bold fs-6 text-success" th:text="${approvedCount}">0</span>
+                            </div>
+
+                            <!-- Rejected / Needs Correction -->
+                            <div class="d-flex justify-content-between align-items-center p-2.5 rounded border border-danger-subtle bg-danger bg-opacity-10">
+                                <div>
+                                    <div class="fw-bold text-dark small">Rejected / Action Needed</div>
+                                    <div class="text-muted" style="font-size: 0.75rem;">Flagged for corrections or rejected</div>
+                                </div>
+                                <span class="fw-bold fs-6 text-danger" th:text="${rejectedCount}">0</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Recent Security Audit Trail Card -->
+        <div class="card border-0 shadow-sm">
+            <div class="card-header py-2.5 px-3 bg-white d-flex justify-content-between align-items-center">
+                <span class="fw-bold text-dark small text-uppercase" style="letter-spacing: 0.5px;">
+                    <i class="bi bi-shield-lock-fill me-1.5 text-danger"></i>Recent Security & Audit Logs
+                </span>
+                <a th:href="@{/admin/audit-log}" class="btn btn-sm btn-outline-secondary py-0.5 px-2" style="font-size: 0.75rem;">
+                    View Full Audit Trail <i class="bi bi-arrow-right ms-1"></i>
+                </a>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-admin align-middle mb-0">
+                        <thead>
+                            <tr>
+                                <th style="width: 160px;">Timestamp</th>
+                                <th style="width: 200px;">Performed By</th>
+                                <th style="width: 130px;">Action</th>
+                                <th style="width: 130px;">Entity</th>
+                                <th style="width: 110px;">IP Address</th>
+                                <th>Details</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:if="${#lists.isEmpty(recentLogs)}">
+                                <td colspan="6" class="text-center text-muted py-4">No audit logs recorded yet.</td>
+                            </tr>
+                            <tr th:each="log : ${recentLogs}">
+                                <td class="font-monospace text-muted small" style="white-space: nowrap;"
+                                    th:text="${#temporals.format(log.timestamp, 'yyyy-MM-dd HH:mm:ss')}"></td>
+                                <td class="fw-semibold text-dark text-truncate" style="max-width: 180px;"
+                                    th:text="${log.actorEmail}" th:title="${log.actorEmail}"></td>
+                                <td>
+                                    <span th:if="${#strings.contains(log.action, 'APPROVE')}" class="badge badge-subtle-success" th:text="${log.action}"></span>
+                                    <span th:if="${#strings.contains(log.action, 'REJECT')}" class="badge badge-subtle-danger" th:text="${log.action}"></span>
+                                    <span th:if="${#strings.contains(log.action, 'CORRECTION')}" class="badge badge-subtle-warning" th:text="${log.action}"></span>
+                                    <span th:if="${#strings.contains(log.action, 'USER_') or #strings.contains(log.action, 'ROLE_')}" class="badge badge-subtle-info" th:text="${log.action}"></span>
+                                    <span th:if="${!#strings.contains(log.action, 'APPROVE') and !#strings.contains(log.action, 'REJECT') and !#strings.contains(log.action, 'CORRECTION') and !#strings.contains(log.action, 'USER_') and !#strings.contains(log.action, 'ROLE_')}"
+                                          class="badge badge-subtle-secondary" th:text="${log.action}"></span>
+                                </td>
+                                <td>
+                                    <span class="small font-monospace" th:text="${log.entityName + (log.entityId != null ? ' #' + log.entityId : '')}"></span>
+                                </td>
+                                <td class="font-monospace text-muted small" th:text="${log.ipAddress}"></td>
+                                <td class="text-muted small text-truncate" style="max-width: 300px;"
+                                    th:text="${log.details}" th:title="${log.details}"></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+    </main>
+</div>
+
+<footer th:replace="~{fragments/footer :: footer}"></footer>
+<th:block th:replace="~{fragments/footer :: scripts}"></th:block>
+</body>
+</html>

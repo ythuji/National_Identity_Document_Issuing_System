@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/header :: head('Payment History')}"></head>
+<body class="d-flex flex-column min-vh-100">
+
+<nav th:replace="~{fragments/header :: navbar}"></nav>
+
+<main class="container py-4 flex-grow-1">
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h3 class="fw-bold mb-0"><i class="bi bi-wallet2 me-2 text-primary"></i>My Payment Transactions</h3>
+            <p class="text-muted small mb-0">Record of electronic fee payments for all government document services.</p>
+        </div>
+        <div>
+            <a th:href="@{/dashboard}" class="btn btn-outline-secondary btn-sm">
+                <i class="bi bi-speedometer2 me-1"></i>Dashboard
+            </a>
+        </div>
+    </div>
+
+    <!-- Alert Message -->
+    <div th:if="${successMessage}" class="alert alert-success alert-dismissible fade show" role="alert">
+        <i class="bi bi-check-circle-fill me-2"></i>
+        <span th:text="${successMessage}"></span>
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+
+    <div class="card border-0 shadow-sm">
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th class="ps-4">Transaction ID</th>
+                            <th>Application Ref</th>
+                            <th>Service Type</th>
+                            <th>Amount (LKR)</th>
+                            <th>Payment Date</th>
+                            <th>Status</th>
+                            <th class="text-end pe-4">Receipt</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:if="${#lists.isEmpty(transactions)}">
+                            <td colspan="7" class="text-center text-muted py-5">
+                                <i class="bi bi-cash-stack fs-1 d-block mb-2 text-secondary"></i>
+                                No payment transactions recorded yet.
+                            </td>
+                        </tr>
+                        <tr th:each="txn : ${transactions}">
+                            <td class="ps-4 fw-bold font-monospace">
+                                <span th:text="${txn.transactionId}"></span>
+                            </td>
+                            <td class="font-monospace fw-semibold" th:text="${txn.applicationReference}"></td>
+                            <td>
+                                <span th:if="${#strings.toString(txn.applicationType) == 'LICENSE'}" class="badge bg-primary bg-opacity-10 text-primary">Driver's License</span>
+                                <span th:if="${#strings.toString(txn.applicationType) == 'PASSPORT'}" class="badge bg-success bg-opacity-10 text-success">Passport</span>
+                                <span th:if="${#strings.toString(txn.applicationType) == 'NIC'}" class="badge bg-info bg-opacity-10 text-info">NIC</span>
+                            </td>
+                            <td class="fw-bold" th:text="${#numbers.formatDecimal(txn.amount, 1, 'COMMA', 2, 'POINT')}">500.00</td>
+                            <td th:text="${#temporals.format(txn.createdAt, 'yyyy-MM-dd HH:mm')}"></td>
+                            <td>
+                                <span th:if="${#strings.toString(txn.paymentStatus) == 'PAID'}" class="badge bg-success">
+                                    <i class="bi bi-check-circle me-1"></i>PAID
+                                </span>
+                                <span th:if="${#strings.toString(txn.paymentStatus) == 'FAILED'}" class="badge bg-danger">
+                                    <i class="bi bi-x-circle me-1"></i>FAILED
+                                </span>
+                                <span th:if="${#strings.toString(txn.paymentStatus) == 'PENDING'}" class="badge bg-warning text-dark">
+                                    <i class="bi bi-hourglass me-1"></i>PENDING
+                                </span>
+                            </td>
+                            <td class="text-end pe-4">
+                                <a th:if="${#strings.toString(txn.paymentStatus) == 'PAID'}"
+                                   th:href="@{/payment/receipt/{txnId}(txnId=${txn.transactionId})}" class="btn btn-sm btn-outline-primary">
+                                    <i class="bi bi-receipt me-1"></i>View Receipt
+                                </a>
+                                <span th:if="${#strings.toString(txn.paymentStatus) != 'PAID'}" class="text-muted small">-</span>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+</main>
+
+<footer th:replace="~{fragments/footer :: footer}"></footer>
+<th:block th:replace="~{fragments/footer :: scripts}"></th:block>
+</body>
+</html>
+

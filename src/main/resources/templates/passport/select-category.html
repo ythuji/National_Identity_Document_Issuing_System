@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/header :: head('Passport Services')}"></head>
+<body class="d-flex flex-column min-vh-100">
+
+<nav th:replace="~{fragments/header :: navbar}"></nav>
+
+<main class="container py-5 flex-grow-1">
+    <div class="row justify-content-center mb-4">
+        <div class="col-lg-8 text-center">
+            <span class="badge bg-success px-3 py-2 rounded-pill mb-2">Department of Immigration & Emigration</span>
+            <h2 class="fw-bold">Sri Lankan Passport Services</h2>
+            <p class="text-muted">Choose the passport application service appropriate for your situation.</p>
+        </div>
+    </div>
+
+    <div class="row g-4 justify-content-center">
+        <!-- New Passport (F4) -->
+        <div class="col-md-4">
+            <div class="card h-100 p-4 border-0 shadow-sm text-center">
+                <div class="mb-3">
+                    <div class="rounded-circle bg-success bg-opacity-10 d-inline-flex p-3 text-success">
+                        <i class="bi bi-globe display-5"></i>
+                    </div>
+                </div>
+                <h4 class="fw-bold">New Passport (F4)</h4>
+                <p class="text-muted small mb-4">
+                    For first-time Sri Lankan passport applicants. Requires bio-data entry, digital photograph, and birth certificate attachment.
+                </p>
+                <div class="mt-auto">
+                    <a th:href="@{/passport/apply/new}" class="btn btn-success w-100 py-2">
+                        Apply for New Passport <i class="bi bi-arrow-right ms-1"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Passport Renewal (F5) -->
+        <div class="col-md-4">
+            <div class="card h-100 p-4 border-0 shadow-sm text-center">
+                <div class="mb-3">
+                    <div class="rounded-circle bg-primary bg-opacity-10 d-inline-flex p-3 text-primary">
+                        <i class="bi bi-arrow-repeat display-5"></i>
+                    </div>
+                </div>
+                <h4 class="fw-bold">Passport Renewal (F5)</h4>
+                <p class="text-muted small mb-4">
+                    Renew an expired or full passport. Automatic retrieval pre-populates your bio-data using your previous passport number.
+                </p>
+                <div class="mt-auto">
+                    <a th:href="@{/passport/apply/renewal}" class="btn btn-primary w-100 py-2">
+                        Renew Existing Passport <i class="bi bi-arrow-right ms-1"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Lost / Stolen (F6) -->
+        <div class="col-md-4">
+            <div class="card h-100 p-4 border-0 shadow-sm text-center">
+                <div class="mb-3">
+                    <div class="rounded-circle bg-danger bg-opacity-10 d-inline-flex p-3 text-danger">
+                        <i class="bi bi-shield-x display-5"></i>
+                    </div>
+                </div>
+                <h4 class="fw-bold">Lost / Damaged (F6)</h4>
+                <p class="text-muted small mb-4">
+                    Report a lost, stolen, or mutilated passport and apply for a replacement. Mandatory submission of police report excerpt.
+                </p>
+                <div class="mt-auto">
+                    <a th:href="@{/passport/apply/lost}" class="btn btn-danger w-100 py-2">
+                        Apply for Replacement <i class="bi bi-arrow-right ms-1"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="text-center mt-5">
+        <a th:href="@{/passport/my-applications}" class="btn btn-outline-secondary">
+            <i class="bi bi-journal-text me-1"></i>View My Passport Applications & Saved Drafts
+        </a>
+    </div>
+</main>
+
+<footer th:replace="~{fragments/footer :: footer}"></footer>
+<th:block th:replace="~{fragments/footer :: scripts}"></th:block>
+</body>
+</html>
+

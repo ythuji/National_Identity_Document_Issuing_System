@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/header :: head('My Passport Applications')}"></head>
+<body class="d-flex flex-column min-vh-100">
+
+<nav th:replace="~{fragments/header :: navbar}"></nav>
+
+<main class="container py-4 flex-grow-1">
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h3 class="fw-bold mb-0"><i class="bi bi-globe me-2 text-success"></i>My Passport Applications</h3>
+            <p class="text-muted small mb-0">Track all your submitted Sri Lankan passport requests and drafts.</p>
+        </div>
+        <div>
+            <a th:href="@{/passport}" class="btn btn-success btn-sm">
+                <i class="bi bi-plus-circle me-1"></i>New Application
+            </a>
+            <a th:href="@{/dashboard}" class="btn btn-outline-secondary btn-sm ms-2">
+                <i class="bi bi-speedometer2 me-1"></i>Dashboard
+            </a>
+        </div>
+    </div>
+
+    <!-- Alert Messages -->
+    <div th:if="${successMessage}" class="alert alert-success alert-dismissible fade show" role="alert">
+        <i class="bi bi-check-circle-fill me-2"></i>
+        <span th:text="${successMessage}"></span>
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+    <div th:if="${infoMessage}" class="alert alert-info alert-dismissible fade show" role="alert">
+        <i class="bi bi-info-circle-fill me-2"></i>
+        <span th:text="${infoMessage}"></span>
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+
+    <div class="card border-0 shadow-sm">
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th class="ps-4">Reference No</th>
+                            <th>Category</th>
+                            <th>Applicant Full Name</th>
+                            <th>Date Created</th>
+                            <th>Status</th>
+                            <th class="text-end pe-4">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:if="${#lists.isEmpty(applications)}">
+                            <td colspan="6" class="text-center text-muted py-5">
+                                <i class="bi bi-inbox fs-1 d-block mb-2 text-secondary"></i>
+                                You have not submitted any passport applications yet.
+                            </td>
+                        </tr>
+                        <tr th:each="app : ${applications}">
+                            <td class="ps-4 fw-bold">
+                                <a th:href="@{/passport/view/{id}(id=${app.id})}" th:text="${app.referenceNumber}" class="text-decoration-none text-success"></a>
+                            </td>
+                            <td>
+                                <span class="badge bg-light text-dark border" th:text="${app.category}"></span>
+                            </td>
+                            <td th:text="${app.fullName}"></td>
+                            <td th:text="${#temporals.format(app.createdAt, 'yyyy-MM-dd')}"></td>
+                            <td>
+                                <span th:if="${#strings.toString(app.status) == 'SUBMITTED'}" class="badge bg-info text-dark">Submitted</span>
+                                <span th:if="${#strings.toString(app.status) == 'UNDER_REVIEW'}" class="badge bg-warning text-dark">Under Review</span>
+                                <span th:if="${#strings.toString(app.status) == 'APPROVED'}" class="badge bg-success">Approved</span>
+                                <span th:if="${#strings.toString(app.status) == 'PAYMENT_VERIFIED'}" class="badge bg-info text-dark">Payment Verified</span>
+                                <span th:if="${#strings.toString(app.status) == 'SHIPPED'}" class="badge bg-primary">Shipped</span>
+                                <span th:if="${#strings.toString(app.status) == 'RECEIVED'}" class="badge bg-success">Received</span>
+                                <span th:if="${#strings.toString(app.status) == 'REJECTED'}" class="badge bg-danger">Rejected</span>
+                                <span th:if="${#strings.toString(app.status) == 'PENDING_CORRECTION'}" class="badge bg-secondary">Needs Correction</span>
+                                <span th:if="${#strings.toString(app.status) == 'DRAFT'}" class="badge bg-light text-dark border">Draft</span>
+                            </td>
+                            <td class="text-end pe-4">
+                                <a th:if="${!app.isDraft}" th:href="@{/passport/view/{id}(id=${app.id})}" class="btn btn-sm btn-outline-success">
+                                    <i class="bi bi-eye me-1"></i>View
+                                </a>
+                                <div th:if="${app.isDraft}" class="d-inline-flex gap-1">
+                                    <a th:href="@{/passport/apply/{cat}(cat=${app.category.name().toLowerCase()})}" class="btn btn-sm btn-outline-success">
+                                        <i class="bi bi-pencil-square me-1"></i>Resume
+                                    </a>
+                                    <form th:action="@{/passport/delete-draft/{id}(id=${app.id})}" method="post" class="d-inline"
+                                          onsubmit="return confirm('Are you sure you want to discard this draft?');">
+                                        <button type="submit" class="btn btn-sm btn-outline-danger">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+</main>
+
+<footer th:replace="~{fragments/footer :: footer}"></footer>
+<th:block th:replace="~{fragments/footer :: scripts}"></th:block>
+</body>
+</html>
+

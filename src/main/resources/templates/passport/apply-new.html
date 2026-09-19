@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/header :: head('New Passport Application (F4)')}"></head>
+<body class="d-flex flex-column min-vh-100">
+
+<nav th:replace="~{fragments/header :: navbar}"></nav>
+
+<main class="container py-4 flex-grow-1">
+    <div class="row justify-content-center">
+        <div class="col-lg-9">
+
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <div>
+                    <h3 class="fw-bold mb-0"><i class="bi bi-globe me-2 text-success"></i>New Passport Application (Form F4)</h3>
+                    <p class="text-muted small mb-0">Fill in bio-data accurately as per your Sri Lankan Birth Certificate.</p>
+                </div>
+                <a th:href="@{/passport}" class="btn btn-outline-secondary btn-sm">
+                    <i class="bi bi-arrow-left me-1"></i>Back
+                </a>
+            </div>
+
+            <!-- Error alert -->
+            <div th:if="${errorMessage}" class="alert alert-danger alert-dismissible fade show" role="alert">
+                <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                <span th:text="${errorMessage}"></span>
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+
+            <div class="card border-0 shadow-sm">
+                <div class="card-body p-4">
+                    <form th:action="@{/passport/apply}" th:object="${passportDto}" method="post" enctype="multipart/form-data">
+                        <input type="hidden" th:field="*{id}">
+                        <input type="hidden" th:field="*{category}">
+
+                        <!-- Section 1: Bio-Data -->
+                        <h5 class="fw-bold text-success border-bottom pb-2 mb-3">
+                            <i class="bi bi-person-bounding-box me-2"></i>1. Applicant Bio-Data
+                        </h5>
+
+                        <div class="mb-3">
+                            <label for="fullName" class="form-label">Full Name (in English capital letters)</label>
+                            <input type="text" class="form-control text-uppercase" id="fullName" th:field="*{fullName}"
+                                   th:classappend="${#fields.hasErrors('fullName')} ? 'is-invalid' : ''" required>
+                            <div class="invalid-feedback" th:errors="*{fullName}"></div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="dateOfBirth" class="form-label">Date of Birth</label>
+                                <input type="date" class="form-control" id="dateOfBirth" th:field="*{dateOfBirth}"
+                                       th:classappend="${#fields.hasErrors('dateOfBirth')} ? 'is-invalid' : ''" required>
+                                <div class="invalid-feedback" th:errors="*{dateOfBirth}"></div>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="gender" class="form-label">Gender</label>
+                                <select class="form-select" id="gender" th:field="*{gender}" required>
+                                    <option value="">-- Select Gender --</option>
+                                    <option value="Male">Male</option>
+                                    <option value="Female">Female</option>
+                                    <option value="Other">Other</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="placeOfBirth" class="form-label">Place / City of Birth</label>
+                                <input type="text" class="form-control" id="placeOfBirth" th:field="*{placeOfBirth}" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="nationality" class="form-label">Citizenship / Nationality</label>
+                                <input type="text" class="form-control" id="nationality" th:field="*{nationality}" required>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="profession" class="form-label">Profession / Occupation</label>
+                                <input type="text" class="form-control" id="profession" th:field="*{profession}" placeholder="e.g. Software Engineer">
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="phone" class="form-label">Contact Mobile</label>
+                                <input type="tel" class="form-control" id="phone" th:field="*{phone}" required>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="address" class="form-label">Permanent Residence in Sri Lanka</label>
+                            <textarea class="form-control" id="address" th:field="*{address}" rows="2" required></textarea>
+                        </div>
+
+                        <div class="form-check mb-3">
+                            <input class="form-check-input" type="checkbox" id="dualCitizenship" th:field="*{dualCitizenship}">
+                            <label class="form-check-label" for="dualCitizenship">
+                                I hold dual citizenship status.
+                            </label>
+                        </div>
+
+                        <!-- Section 2: Document Attachments -->
+                        <h5 class="fw-bold text-success border-bottom pb-2 my-4">
+                            <i class="bi bi-cloud-arrow-up-fill me-2"></i>2. Required Supporting Documents (Stored in MS SQL)
+                        </h5>
+
+                        <div class="row g-3">
+                            <div class="col-md-4">
+                                <label class="form-label fw-semibold">ICAO Standard Studio Photo <span class="text-danger">*</span></label>
+                                <input type="file" class="form-control" name="photoFile" accept="image/*" required>
+                                <div class="form-text">35mm x 45mm white background</div>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label fw-semibold">National Identity Card Copy <span class="text-danger">*</span></label>
+                                <input type="file" class="form-control" name="nicCopyFile" accept="image/*,.pdf" required>
+                                <div class="form-text">Certified copy of NIC front and back</div>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label fw-semibold">Original Birth Certificate <span class="text-danger">*</span></label>
+                                <input type="file" class="form-control" name="birthCertFile" accept="image/*,.pdf" required>
+                                <div class="form-text">Clear scan of birth certificate</div>
+                            </div>
+                        </div>
+
+                        <!-- Actions -->
+                        <div class="d-flex justify-content-between align-items-center mt-5 pt-3 border-top">
+                            <button type="submit" th:formaction="@{/passport/draft}" class="btn btn-outline-secondary">
+                                <i class="bi bi-bookmark me-1"></i>Save as Draft
+                            </button>
+                            <button type="submit" class="btn btn-success px-4 py-2 fw-semibold">
+                                <i class="bi bi-send-check-fill me-2"></i>Submit Passport Application
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</main>
+
+<footer th:replace="~{fragments/footer :: footer}"></footer>
+<th:block th:replace="~{fragments/footer :: scripts}"></th:block>
+</body>
+</html>
+

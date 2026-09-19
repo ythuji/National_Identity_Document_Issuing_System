@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/header :: head('Government Digital Payment Gateway')}"></head>
+<body class="d-flex flex-column min-vh-100">
+
+<nav th:replace="~{fragments/header :: navbar}"></nav>
+
+<main class="container py-5 flex-grow-1">
+    <div class="row justify-content-center">
+        <div class="col-lg-10">
+
+            <div class="text-center mb-4">
+                <span class="badge bg-primary bg-opacity-10 text-primary px-3 py-2 rounded-pill mb-2">
+                    <i class="bi bi-shield-lock-fill me-1"></i>LankaPay Government Payment Gateway
+                </span>
+                <h2 class="fw-bold">Secure Online Payment</h2>
+                <p class="text-muted">Digital fee settlement for National Identity Document issuing services.</p>
+            </div>
+
+            <!-- Error alert -->
+            <div th:if="${errorMessage}" class="alert alert-danger alert-dismissible fade show" role="alert">
+                <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                <span th:text="${errorMessage}"></span>
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+
+            <div class="row g-4">
+                <!-- Left: Application Fee Order Summary -->
+                <div class="col-md-5">
+                    <div class="card border-0 shadow-sm h-100">
+                        <div class="card-header bg-primary text-white py-3">
+                            <h5 class="fw-bold mb-0"><i class="bi bi-receipt me-2"></i>Fee Breakdown</h5>
+                        </div>
+                        <div class="card-body p-4 d-flex flex-column">
+                            <div class="mb-3">
+                                <label class="text-muted small text-uppercase fw-semibold d-block">Service</label>
+                                <span class="fw-bold fs-6 text-dark" th:text="${paymentDto.serviceName}">Driver's License Service</span>
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="text-muted small text-uppercase fw-semibold d-block">Application Reference</label>
+                                <span class="badge bg-light text-dark border fs-6 font-monospace" th:text="${paymentDto.applicationReference}">LIC-20260919-12345</span>
+                            </div>
+
+                            <div class="mb-4">
+                                <label class="text-muted small text-uppercase fw-semibold d-block">Document Type</label>
+                                <span class="badge bg-info text-dark" th:text="${paymentDto.applicationType}">NIC</span>
+                            </div>
+
+                            <div class="border-top pt-3 mt-auto">
+                                <div class="d-flex justify-content-between align-items-center mb-2">
+                                    <span class="text-muted">Government Processing Fee:</span>
+                                    <span class="fw-semibold">LKR <span th:text="${#numbers.formatDecimal(paymentDto.amount, 1, 'COMMA', 2, 'POINT')}">500.00</span></span>
+                                </div>
+                                <div class="d-flex justify-content-between align-items-center mb-2">
+                                    <span class="text-muted">Digital Gateway Charge:</span>
+                                    <span class="text-success fw-semibold">LKR 0.00 (Waived)</span>
+                                </div>
+                                <hr>
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <span class="fs-5 fw-bold text-dark">Total Payable:</span>
+                                    <span class="fs-4 fw-bold text-primary">LKR <span th:text="${#numbers.formatDecimal(paymentDto.amount, 1, 'COMMA', 2, 'POINT')}">500.00</span></span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right: Card Input & Payment Processing Form -->
+                <div class="col-md-7">
+                    <div class="card border-0 shadow-sm">
+                        <div class="card-header bg-white py-3 border-bottom d-flex justify-content-between align-items-center">
+                            <h5 class="fw-bold mb-0 text-dark"><i class="bi bi-credit-card-2-front-fill me-2 text-primary"></i>Debit / Credit Card</h5>
+                            <div>
+                                <i class="bi bi-credit-card fs-4 text-primary me-2"></i>
+                                <span class="badge bg-success bg-opacity-10 text-success"><i class="bi bi-lock-fill me-1"></i>256-Bit SSL Encrypted</span>
+                            </div>
+                        </div>
+                        <div class="card-body p-4">
+
+                            <!-- Test card helper badge -->
+                            <div class="alert alert-light border d-flex align-items-start small mb-4">
+                                <i class="bi bi-info-circle-fill text-primary fs-5 me-2 mt-1"></i>
+                                <div>
+                                    <strong>Gateway Sandbox:</strong> Enter any 16-digit card number (e.g. <code>4242 4242 4242 4242</code>) and valid expiry.
+                                    <span class="text-muted d-block">Use CVV <code>123</code> for Instant Approval, or CVV <code>000</code> to test decline simulation.</span>
+                                </div>
+                            </div>
+
+                            <form th:action="@{/payment/process}" th:object="${paymentDto}" method="post">
+                                <input type="hidden" th:field="*{applicationType}">
+                                <input type="hidden" th:field="*{applicationId}">
+                                <input type="hidden" th:field="*{applicationReference}">
+                                <input type="hidden" th:field="*{serviceName}">
+                                <input type="hidden" th:field="*{amount}">
+                                <input type="hidden" th:field="*{paymentMethod}">
+
+                                <div class="mb-3">
+                                    <label for="cardHolderName" class="form-label">Cardholder Full Name <span class="text-danger">*</span></label>
+                                    <input type="text" class="form-control text-uppercase" id="cardHolderName" th:field="*{cardHolderName}"
+                                           placeholder="e.g. K. A. D. SILVA"
+                                           th:classappend="${#fields.hasErrors('cardHolderName')} ? 'is-invalid' : ''" required>
+                                    <div class="invalid-feedback" th:errors="*{cardHolderName}"></div>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label for="cardNumber" class="form-label">Card Number <span class="text-danger">*</span></label>
+                                    <div class="input-group">
+                                        <span class="input-group-text bg-white"><i class="bi bi-credit-card-2-front"></i></span>
+                                        <input type="text" class="form-control font-monospace" id="cardNumber" th:field="*{cardNumber}"
+                                               placeholder="4242 4242 4242 4242" maxlength="19"
+                                               th:classappend="${#fields.hasErrors('cardNumber')} ? 'is-invalid' : ''" required>
+                                    </div>
+                                    <div class="invalid-feedback d-block" th:if="${#fields.hasErrors('cardNumber')}" th:errors="*{cardNumber}"></div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-md-7 mb-3">
+                                        <label class="form-label">Expiration Date (MM / YY) <span class="text-danger">*</span></label>
+                                        <div class="d-flex gap-2">
+                                            <input type="text" class="form-control text-center font-monospace" placeholder="MM"
+                                                   th:field="*{expiryMonth}" maxlength="2"
+                                                   th:classappend="${#fields.hasErrors('expiryMonth')} ? 'is-invalid' : ''" required>
+                                            <span class="align-self-center fw-bold text-muted">/</span>
+                                            <input type="text" class="form-control text-center font-monospace" placeholder="YY"
+                                                   th:field="*{expiryYear}" maxlength="2"
+                                                   th:classappend="${#fields.hasErrors('expiryYear')} ? 'is-invalid' : ''" required>
+                                        </div>
+                                        <div class="invalid-feedback d-block" th:if="${#fields.hasErrors('expiryMonth')}" th:errors="*{expiryMonth}"></div>
+                                        <div class="invalid-feedback d-block" th:if="${#fields.hasErrors('expiryYear')}" th:errors="*{expiryYear}"></div>
+                                    </div>
+                                    <div class="col-md-5 mb-3">
+                                        <label for="cvv" class="form-label">CVV / CVC <span class="text-danger">*</span></label>
+                                        <div class="input-group">
+                                            <input type="password" class="form-control text-center font-monospace" id="cvv"
+                                                   th:field="*{cvv}" placeholder="123" maxlength="4"
+                                                   th:classappend="${#fields.hasErrors('cvv')} ? 'is-invalid' : ''" required>
+                                            <span class="input-group-text bg-white" title="3 or 4 digits on back of card"><i class="bi bi-question-circle"></i></span>
+                                        </div>
+                                        <div class="invalid-feedback d-block" th:if="${#fields.hasErrors('cvv')}" th:errors="*{cvv}"></div>
+                                    </div>
+                                </div>
+
+                                <div class="mt-4 pt-2">
+                                    <button type="submit" class="btn btn-primary w-100 py-3 fw-bold fs-6 shadow-sm">
+                                        <i class="bi bi-shield-check me-2"></i>Confirm & Pay LKR <span th:text="${#numbers.formatDecimal(paymentDto.amount, 1, 'COMMA', 2, 'POINT')}">500.00</span>
+                                    </button>
+                                </div>
+                            </form>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</main>
+
+<footer th:replace="~{fragments/footer :: footer}"></footer>
+<th:block th:replace="~{fragments/footer :: scripts}"></th:block>
+
+<script>
+// Auto-format card number with spaces every 4 digits
+const cardInput = document.getElementById('cardNumber');
+if (cardInput) {
+    cardInput.addEventListener('input', function(e) {
+        let val = e.target.value.replace(/\s+/g, '').replace(/[^0-9]/gi, '');
+        let formatted = '';
+        for (let i = 0; i < val.length; i++) {
+            if (i > 0 && i % 4 === 0) formatted += ' ';
+            formatted += val[i];
+        }
+        e.target.value = formatted;
+    });
+}
+</script>
+
+</body>
+</html>
+

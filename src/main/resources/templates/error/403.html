@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/header :: head('Access Denied')}"></head>
+<body class="d-flex flex-column min-vh-100">
+
+<nav th:replace="~{fragments/header :: navbar}"></nav>
+
+<main class="container py-5 flex-grow-1 d-flex align-items-center justify-content-center">
+    <div class="text-center p-5 bg-white rounded-4 shadow-sm" style="max-width: 550px;">
+        <div class="rounded-circle bg-danger bg-opacity-10 d-inline-flex p-4 text-danger mb-3">
+            <i class="bi bi-shield-lock-fill display-3"></i>
+        </div>
+        <h2 class="fw-bold text-dark mb-2">403 — Access Denied</h2>
+        <p class="text-muted mb-4">
+            You do not have the required security permissions or role privileges to view this government resource.
+        </p>
+        <div class="d-flex justify-content-center gap-2">
+            <a th:href="@{/dashboard}" class="btn btn-primary px-4">
+                <i class="bi bi-house-door me-1"></i>Return to Dashboard
+            </a>
+            <a th:href="@{/login}" class="btn btn-outline-secondary px-4">
+                <i class="bi bi-box-arrow-in-right me-1"></i>Switch Account
+            </a>
+        </div>
+    </div>
+</main>
+
+<footer th:replace="~{fragments/footer :: footer}"></footer>
+<th:block th:replace="~{fragments/footer :: scripts}"></th:block>
+</body>
+</html>
+

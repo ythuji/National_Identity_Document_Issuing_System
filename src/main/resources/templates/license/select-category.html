@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/header :: head('Driving License Services')}"></head>
+<body class="d-flex flex-column min-vh-100">
+
+<nav th:replace="~{fragments/header :: navbar}"></nav>
+
+<main class="container py-5 flex-grow-1">
+    <div class="row justify-content-center mb-4">
+        <div class="col-lg-8 text-center">
+            <span class="badge bg-primary px-3 py-2 rounded-pill mb-2">Department of Motor Traffic</span>
+            <h2 class="fw-bold">Driving License Services</h2>
+            <p class="text-muted">Select the type of driving license service you wish to apply for.</p>
+        </div>
+    </div>
+
+    <div class="row g-4 justify-content-center">
+        <!-- New License (F1) -->
+        <div class="col-md-4">
+            <div class="card h-100 p-4 border-0 shadow-sm text-center">
+                <div class="mb-3">
+                    <div class="rounded-circle bg-primary bg-opacity-10 d-inline-flex p-3 text-primary">
+                        <i class="bi bi-file-earmark-plus display-5"></i>
+                    </div>
+                </div>
+                <h4 class="fw-bold">New License (F1)</h4>
+                <p class="text-muted small mb-4">
+                    For first-time applicants applying for a learner's permit or new permanent driver's license. Medical certificate required.
+                </p>
+                <div class="mt-auto">
+                    <a th:href="@{/license/apply/new}" class="btn btn-primary w-100 py-2">
+                        Apply for New License <i class="bi bi-arrow-right ms-1"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- License Renewal (F2) -->
+        <div class="col-md-4">
+            <div class="card h-100 p-4 border-0 shadow-sm text-center">
+                <div class="mb-3">
+                    <div class="rounded-circle bg-success bg-opacity-10 d-inline-flex p-3 text-success">
+                        <i class="bi bi-arrow-repeat display-5"></i>
+                    </div>
+                </div>
+                <h4 class="fw-bold">License Renewal (F2)</h4>
+                <p class="text-muted small mb-4">
+                    Renew an existing expired or expiring driving license. Auto-lookup pre-fills existing details by your license number.
+                </p>
+                <div class="mt-auto">
+                    <a th:href="@{/license/apply/renewal}" class="btn btn-success w-100 py-2">
+                        Renew Existing License <i class="bi bi-arrow-right ms-1"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Lost / Replacement (F3) -->
+        <div class="col-md-4">
+            <div class="card h-100 p-4 border-0 shadow-sm text-center">
+                <div class="mb-3">
+                    <div class="rounded-circle bg-warning bg-opacity-10 d-inline-flex p-3 text-warning">
+                        <i class="bi bi-shield-exclamation display-5"></i>
+                    </div>
+                </div>
+                <h4 class="fw-bold">Lost / Duplicate (F3)</h4>
+                <p class="text-muted small mb-4">
+                    Obtain a duplicate driving license in case of loss, theft, or damage. Police station incident report mandatory.
+                </p>
+                <div class="mt-auto">
+                    <a th:href="@{/license/apply/lost}" class="btn btn-warning w-100 py-2 text-dark">
+                        Apply for Replacement <i class="bi bi-arrow-right ms-1"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="text-center mt-5">
+        <a th:href="@{/license/my-applications}" class="btn btn-outline-secondary">
+            <i class="bi bi-journal-text me-1"></i>View My License Applications & Saved Drafts
+        </a>
+    </div>
+</main>
+
+<footer th:replace="~{fragments/footer :: footer}"></footer>
+<th:block th:replace="~{fragments/footer :: scripts}"></th:block>
+</body>
+</html>
+

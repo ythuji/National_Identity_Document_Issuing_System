@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head th:replace="~{fragments/header :: head('Document Verification & Assessment')}"></head>
+<body class="d-flex flex-column min-vh-100">
+
+<nav th:replace="~{fragments/header :: navbar}"></nav>
+
+<!-- Admin Layout with Sidebar (When Logged in as SUPER_ADMIN) -->
+<div class="admin-layout" sec:authorize="hasAuthority('SUPER_ADMIN')">
+    <aside th:replace="~{fragments/sidebar :: sidebar('queue')}"></aside>
+    <main class="admin-content">
+        <div th:replace="~{::reviewBody}"></div>
+    </main>
+</div>
+
+<!-- Officer Layout Full-Width (When Logged in as Officer / Non-Admin) -->
+<main class="container-fluid px-lg-4 py-3 flex-grow-1" sec:authorize="!hasAuthority('SUPER_ADMIN')">
+    <div th:replace="~{::reviewBody}"></div>
+</main>
+
+<th:block th:if="${false}">
+<div th:fragment="reviewBody">
+
+    <!-- Top Breadcrumb / Navigation -->
+    <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+        <div>
+            <a th:href="@{/verification/queue}" class="text-decoration-none text-muted small">
+                <i class="bi bi-arrow-left me-1"></i>Back to Verification Queue
+            </a>
+            <h4 class="fw-bold mb-0 mt-1 text-dark">
+                Application Review: <span class="text-primary font-monospace" th:text="${app.referenceNumber}">REF-2026-001</span>
+            </h4>
+        </div>
+        <div class="d-flex align-items-center gap-1.5 flex-wrap">
+            <span class="badge badge-subtle-secondary px-2.5 py-1 text-uppercase small" th:text="${applicationType}">NIC</span>
+            <span class="badge badge-subtle-info px-2.5 py-1 small" th:text="${app.category}">NEW</span>
+            <span th:if="${#strings.toString(app.status) == 'APPROVED'}" class="badge badge-subtle-success px-2.5 py-1 small">Approved</span>
+            <span th:if="${#strings.toString(app.status) == 'REJECTED'}" class="badge badge-subtle-danger px-2.5 py-1 small">Rejected</span>
+            <span th:if="${#strings.toString(app.status) == 'PENDING_CORRECTION'}" class="badge badge-subtle-warning px-2.5 py-1 small">Pending Correction</span>
+            <span th:if="${#strings.toString(app.status) == 'UNDER_REVIEW'}" class="badge badge-subtle-primary px-2.5 py-1 small">Under Review</span>
+            <span th:if="${#strings.toString(app.status) == 'SUBMITTED'}" class="badge badge-subtle-info px-2.5 py-1 small">Submitted</span>
+            <span th:if="${#strings.toString(app.status) == 'PAYMENT_VERIFIED'}" class="badge bg-info text-dark px-2.5 py-1 small">Payment Verified</span>
+            <span th:if="${#strings.toString(app.status) == 'SHIPPED'}" class="badge bg-primary px-2.5 py-1 small"><i class="bi bi-box-seam me-1"></i>Shipped</span>
+            <span th:if="${#strings.toString(app.status) == 'RECEIVED'}" class="badge bg-success px-2.5 py-1 small"><i class="bi bi-check-circle me-1"></i>Received</span>
+        </div>
+    </div>
+
+    <!-- Alert Messages -->
+    <div th:if="${errorMessage}" class="alert alert-danger alert-dismissible fade show" role="alert">
+        <i class="bi bi-exclamation-triangle-fill me-2"></i>
+        <span th:text="${errorMessage}"></span>
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+
+    <!-- Previous Remarks (if present) -->
+    <div th:if="${app.officerComment != null and !#strings.isEmpty(app.officerComment)}" class="alert alert-warning mb-4">
+        <h6 class="fw-bold mb-1"><i class="bi bi-chat-square-quote-fill me-2"></i>Recorded Officer Remarks:</h6>
+        <p class="mb-0" th:text="${app.officerComment}"></p>
+    </div>
+
+    <!-- Split Review Container -->
+    <div class="row g-4 mb-4">
+
+        <!-- Left: Applicant Information & Bio-Data -->
+        <div class="col-lg-6">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-header bg-white py-3 border-bottom d-flex justify-content-between align-items-center">
+                    <h5 class="fw-bold mb-0 text-dark">
+                        <i class="bi bi-person-vcard-fill me-2 text-primary"></i>Applicant Profile & Bio-Data
+                    </h5>
+                    <span class="badge bg-light text-muted border">Registered Citizen</span>
+                </div>
+                <div class="card-body p-4">
+                    <table class="table table-sm table-borderless align-middle mb-0">
+                        <tr>
+                            <th class="text-muted ps-0" style="width: 38%;">Full Name:</th>
+                            <td class="fw-bold fs-6" th:text="${app.fullName}"></td>
+                        </tr>
+                        <tr>
+                            <th class="text-muted ps-0">Registered Email:</th>
+                            <td th:text="${user != null ? user.email : 'N/A'}"></td>
+                        </tr>
+                        <tr>
+                            <th class="text-muted ps-0">Primary Contact Phone:</th>
+                            <td th:text="${app.phone}"></td>
+                        </tr>
+                        <tr>
+                            <th class="text-muted ps-0">Date of Birth:</th>
+                            <td class="fw-semibold" th:text="${app.dateOfBirth}"></td>
+                        </tr>
+
+                        <!-- Driver's License Specific Fields -->
+                        <th:block th:if="${#strings.toString(applicationType) == 'LICENSE'}">
+                            <tr>
+                                <th class="text-muted ps-0">Vehicle Class(es):</th>
+                                <td class="fw-bold text-primary" th:text="${app.vehicleClass}"></td>
+                            </tr>
+                            <tr>
+                                <th class="text-muted ps-0">Medical Certificate:</th>
+                                <td>
+                                    <span th:if="${app.medicalCertRequired == true}" class="badge bg-warning text-dark">Required / Attached</span>
+                                    <span th:if="${app.medicalCertRequired != true}" class="badge bg-light text-muted border">Standard</span>
+                                </td>
+                            </tr>
+                            <tr th:if="${app.existingLicenseNumber != null and !#strings.isEmpty(app.existingLicenseNumber)}">
+                                <th class="text-muted ps-0">Existing License No:</th>
+                                <td class="fw-bold text-dark font-monospace" th:text="${app.existingLicenseNumber}"></td>
+                            </tr>
+                            <tr>
+                                <th class="text-muted ps-0">Residential Address:</th>
+                                <td th:text="${app.address}"></td>
+                            </tr>
+                        </th:block>
+
+                        <!-- Passport Specific Fields -->
+                        <th:block th:if="${#strings.toString(applicationType) == 'PASSPORT'}">
+                            <tr>
+                                <th class="text-muted ps-0">Gender:</th>
+                                <td th:text="${app.gender}"></td>
+                            </tr>
+                            <tr>
+                                <th class="text-muted ps-0">Place of Birth:</th>
+                                <td th:text="${app.placeOfBirth}"></td>
+                            </tr>
+                            <tr>
+                                <th class="text-muted ps-0">Nationality / Status:</th>
+                                <td th:text="${app.nationality}"></td>
+                            </tr>
+                            <tr>
+                                <th class="text-muted ps-0">Profession:</th>
+                                <td th:text="${app.profession != null ? app.profession : 'N/A'}"></td>
+                            </tr>
+                            <tr>
+                                <th class="text-muted ps-0">Dual Citizenship:</th>
+                                <td th:text="${app.dualCitizenship == true ? 'Yes' : 'No'}"></td>
+                            </tr>
+                            <tr th:if="${app.existingPassportNumber != null and !#strings.isEmpty(app.existingPassportNumber)}">
+                                <th class="text-muted ps-0">Previous Passport No:</th>
+                                <td class="fw-bold text-dark font-monospace" th:text="${app.existingPassportNumber}"></td>
+                            </tr>
+                            <tr>
+                                <th class="text-muted ps-0">Residential Address:</th>
+                                <td th:text="${app.address}"></td>
+                            </tr>
+                        </th:block>
+
+                        <!-- NIC Specific Fields -->
+                        <th:block th:if="${#strings.toString(applicationType) == 'NIC'}">
+                            <tr>
+                                <th class="text-muted ps-0">Gender:</th>
+                                <td th:text="${app.gender}"></td>
+                            </tr>
+                            <tr>
+                                <th class="text-muted ps-0">Civil Status:</th>
+                                <td th:text="${app.civilStatus}"></td>
+                            </tr>
+                            <tr>
+                                <th class="text-muted ps-0">Occupation:</th>
+                                <td th:text="${app.occupation != null ? app.occupation : 'N/A'}"></td>
+                            </tr>
+                            <tr>
+                                <th class="text-muted ps-0">Permanent Address:</th>
+                                <td th:text="${app.permanentAddress}"></td>
+                            </tr>
+                            <tr>
+                                <th class="text-muted ps-0">GN Division & Number:</th>
+                                <td class="fw-semibold text-dark" th:text="${app.gramaNiladhariDivision}"></td>
+                            </tr>
+                            <tr>
+                                <th class="text-muted ps-0">Divisional Secretariat:</th>
+                                <td class="fw-semibold text-dark" th:text="${app.divisionalSecretariat}"></td>
+                            </tr>
+                            <tr th:if="${app.existingNicNumber != null and !#strings.isEmpty(app.existingNicNumber)}">
+                                <th class="text-muted ps-0">Previous NIC No:</th>
+                                <td class="fw-bold text-dark font-monospace" th:text="${app.existingNicNumber}"></td>
+                            </tr>
+                        </th:block>
+
+                        <tr th:if="${app.policeReportRef != null and !#strings.isEmpty(app.policeReportRef)}">
+                            <th class="text-muted ps-0">Police Entry Ref:</th>
+                            <td class="fw-bold text-danger font-monospace" th:text="${app.policeReportRef}"></td>
+                        </tr>
+                        <tr>
+                            <th class="text-muted ps-0">Application Date:</th>
+                            <td th:text="${app.createdAt != null ? #temporals.format(app.createdAt, 'yyyy-MM-dd HH:mm:ss') : 'N/A'}"></td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right: Uploaded Documents from MS SQL -->
+        <div class="col-lg-6">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-header bg-white py-3 border-bottom d-flex justify-content-between align-items-center">
+                    <h5 class="fw-bold mb-0 text-dark">
+                        <i class="bi bi-file-earmark-check-fill me-2 text-success"></i>Uploaded Supporting Documents (<span th:text="${#lists.size(documents)}"></span>)
+                    </h5>
+                    <span class="badge bg-success bg-opacity-10 text-success">MS SQL Binary Storage</span>
+                </div>
+                <div class="card-body p-4">
+                    <div th:if="${#lists.isEmpty(documents)}" class="text-center text-muted py-5">
+                        <i class="bi bi-file-earmark-x fs-1 d-block mb-2 text-secondary"></i>
+                        No attached documents available for this app.
+                    </div>
+
+                    <div class="row g-3" th:if="${!#lists.isEmpty(documents)}">
+                        <div th:each="doc : ${documents}" class="col-md-6">
+                            <div class="card bg-light border p-3 h-100 d-flex flex-column">
+                                <div class="d-flex align-items-center mb-2">
+                                    <i th:if="${doc.contentType.startsWith('image/')}" class="bi bi-file-image fs-3 text-primary me-2"></i>
+                                    <i th:if="${doc.contentType.equals('application/pdf')}" class="bi bi-file-earmark-pdf fs-3 text-danger me-2"></i>
+                                    <i th:if="${!doc.contentType.startsWith('image/') and !doc.contentType.equals('application/pdf')}" class="bi bi-file-earmark-text fs-3 text-secondary me-2"></i>
+                                    <div class="overflow-hidden">
+                                        <span class="badge bg-dark text-uppercase small" th:text="${doc.documentType}">PHOTO</span>
+                                        <div class="text-truncate small fw-semibold text-dark" th:text="${doc.documentName}">document.jpg</div>
+                                    </div>
+                                </div>
+
+                                <!-- Image Preview Thumbnail if image -->
+                                <div th:if="${doc.contentType.startsWith('image/')}" class="my-2 text-center bg-white p-2 rounded border">
+                                    <img th:if="${#strings.toString(applicationType) == 'LICENSE'}" th:src="@{/license/document/{id}(id=${doc.id})}" alt="Doc Preview" class="img-fluid rounded" style="max-height: 140px; object-fit: contain;">
+                                    <img th:if="${#strings.toString(applicationType) == 'PASSPORT'}" th:src="@{/passport/document/{id}(id=${doc.id})}" alt="Doc Preview" class="img-fluid rounded" style="max-height: 140px; object-fit: contain;">
+                                    <img th:if="${#strings.toString(applicationType) == 'NIC'}" th:src="@{/nic/document/{id}(id=${doc.id})}" alt="Doc Preview" class="img-fluid rounded" style="max-height: 140px; object-fit: contain;">
+                                </div>
+
+                                <div class="mt-auto pt-2">
+                                    <a th:if="${#strings.toString(applicationType) == 'LICENSE'}" th:href="@{/license/document/{id}(id=${doc.id})}" target="_blank" class="btn btn-sm btn-outline-primary w-100">
+                                        <i class="bi bi-box-arrow-up-right me-1"></i>Open Full Document
+                                    </a>
+                                    <a th:if="${#strings.toString(applicationType) == 'PASSPORT'}" th:href="@{/passport/document/{id}(id=${doc.id})}" target="_blank" class="btn btn-sm btn-outline-success w-100">
+                                        <i class="bi bi-box-arrow-up-right me-1"></i>Open Full Document
+                                    </a>
+                                    <a th:if="${#strings.toString(applicationType) == 'NIC'}" th:href="@{/nic/document/{id}(id=${doc.id})}" target="_blank" class="btn btn-sm btn-outline-info w-100">
+                                        <i class="bi bi-box-arrow-up-right me-1"></i>Open Full Document
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Bottom Officer Decision Workflow Panel -->
+    <div class="card border-0 shadow-sm bg-white p-3 px-4">
+        <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
+            <div>
+                <h6 class="fw-bold mb-0 text-dark">
+                    <i class="bi bi-hand-index-thumb-fill me-1.5 text-primary"></i>Officer Assessment & Action
+                </h6>
+                <small class="text-muted">Select an action to proceed with application workflow.</small>
+            </div>
+            <div class="d-flex flex-wrap gap-2">
+
+                <!-- Shipped banner (read-only when already shipped) -->
+                <div th:if="${#strings.toString(app.status) == 'SHIPPED'}" class="alert alert-info py-2 px-3 mb-0 d-flex align-items-center gap-2">
+                    <i class="bi bi-box-seam-fill"></i>
+                    <span>Document has been <strong>shipped</strong> to the citizen. Awaiting receipt confirmation.</span>
+                </div>
+
+                <!-- Received banner (read-only when already received) -->
+                <div th:if="${#strings.toString(app.status) == 'RECEIVED'}" class="alert alert-success py-2 px-3 mb-0 d-flex align-items-center gap-2">
+                    <i class="bi bi-check-circle-fill"></i>
+                    <span>Citizen has <strong>confirmed receipt</strong>. Application fully completed.</span>
+                </div>
+
+                <!-- Verify Payment + Ship (shown when APPROVED and payment is PAID) -->
+                <form th:if="${#strings.toString(app.status) == 'APPROVED' and #strings.toString(paymentStatus) == 'PAID'}"
+                      th:action="@{/verification/action}" method="post" class="d-inline">
+                    <input type="hidden" name="applicationType" th:value="${applicationType}">
+                    <input type="hidden" name="applicationId" th:value="${app.id}">
+                    <input type="hidden" name="action" value="PAYMENT_VERIFY">
+                    <button type="submit" class="btn btn-info px-3 py-1 fw-semibold text-dark">
+                        <i class="bi bi-credit-card-2-front-fill me-1"></i>Verify Payment & Dispatch
+                    </button>
+                </form>
+
+                <!-- Payment pending notice (APPROVED but not yet paid) -->
+                <div th:if="${#strings.toString(app.status) == 'APPROVED' and #strings.toString(paymentStatus) != 'PAID'}"
+                     class="alert alert-warning py-2 px-3 mb-0 d-flex align-items-center gap-2">
+                    <i class="bi bi-hourglass-split"></i>
+                    <span>Awaiting citizen payment. Payment status: <strong th:text="${paymentStatus}">PENDING</strong></span>
+                </div>
+
+                <!-- Approve Button (triggers modal) -->
+                <button th:if="${#strings.toString(app.status) != 'APPROVED' and #strings.toString(app.status) != 'SHIPPED' and #strings.toString(app.status) != 'RECEIVED' and #strings.toString(app.status) != 'REJECTED'}"
+                        type="button" class="btn btn-success px-3 py-1 fw-semibold" data-bs-toggle="modal" data-bs-target="#modalApprove">
+                    <i class="bi bi-check-circle-fill me-1"></i>Approve Application
+                </button>
+
+                <!-- Correction Button (triggers modal) -->
+                <button th:if="${#strings.toString(app.status) != 'APPROVED' and #strings.toString(app.status) != 'SHIPPED' and #strings.toString(app.status) != 'RECEIVED' and #strings.toString(app.status) != 'REJECTED'}"
+                    type="button" class="btn btn-warning px-3 py-1 fw-semibold text-dark" data-bs-toggle="modal" data-bs-target="#modalCorrection">
+                    <i class="bi bi-exclamation-diamond-fill me-1"></i>Request Correction
+                </button>
+
+                <!-- Reject Button (triggers modal) -->
+                <button th:if="${#strings.toString(app.status) != 'APPROVED' and #strings.toString(app.status) != 'SHIPPED' and #strings.toString(app.status) != 'RECEIVED' and #strings.toString(app.status) != 'REJECTED'}"
+                    type="button" class="btn btn-danger px-3 py-1 fw-semibold" data-bs-toggle="modal" data-bs-target="#modalReject">
+                    <i class="bi bi-x-circle-fill me-1"></i>Reject Application
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+</th:block>
+
+<!-- Modal: Approve -->
+<div class="modal fade" id="modalApprove" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form th:action="@{/verification/action}" method="post">
+                <input type="hidden" name="applicationType" th:value="${applicationType}">
+                <input type="hidden" name="applicationId" th:value="${app.id}">
+                <input type="hidden" name="action" value="APPROVE">
+
+                <div class="modal-header bg-success text-white">
+                    <h5 class="modal-title fw-bold"><i class="bi bi-check-circle-fill me-2"></i>Confirm Application Approval</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <p>Are you sure you want to <strong>APPROVE</strong> this application? The citizen will receive an automated approval notification.</p>
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Approval Remarks (Optional):</label>
+                        <textarea class="form-control" name="officerComment" rows="3" placeholder="e.g. All biometrics and documents verified. Approved for dispatch."></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-light" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-success fw-bold px-4">Confirm Approval</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Modal: Request Correction -->
+<div class="modal fade" id="modalCorrection" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form th:action="@{/verification/action}" method="post">
+                <input type="hidden" name="applicationType" th:value="${applicationType}">
+                <input type="hidden" name="applicationId" th:value="${app.id}">
+                <input type="hidden" name="action" value="CORRECTION">
+
+                <div class="modal-header bg-warning text-dark">
+                    <h5 class="modal-title fw-bold"><i class="bi bi-exclamation-diamond-fill me-2"></i>Request Citizen Correction</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <p>Please specify the corrections or additional documents required from the applicant:</p>
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Correction Instructions <span class="text-danger">*</span></label>
+                        <textarea class="form-control" name="officerComment" rows="4" placeholder="e.g. Upload a clearer photograph with a white background and certified copy of GN certificate." required></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-light" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-warning fw-bold px-4 text-dark">Send Correction Request</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Modal: Reject -->
+<div class="modal fade" id="modalReject" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form th:action="@{/verification/action}" method="post">
+                <input type="hidden" name="applicationType" th:value="${applicationType}">
+                <input type="hidden" name="applicationId" th:value="${app.id}">
+                <input type="hidden" name="action" value="REJECT">
+
+                <div class="modal-header bg-danger text-white">
+                    <h5 class="modal-title fw-bold"><i class="bi bi-x-circle-fill me-2"></i>Reject Application</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <p class="text-danger fw-semibold">Warning: This action will permanently mark the application as REJECTED.</p>
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Rejection Justification / Reason <span class="text-danger">*</span></label>
+                        <textarea class="form-control" name="officerComment" rows="4" placeholder="e.g. Ineligible category, invalid supporting documents provided." required></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-light" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-danger fw-bold px-4">Confirm Rejection</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<footer th:replace="~{fragments/footer :: footer}"></footer>
+<th:block th:replace="~{fragments/footer :: scripts}"></th:block>
+</body>
+</html>
+

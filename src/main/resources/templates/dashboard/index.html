@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head th:replace="~{fragments/header :: head('Dashboard')}"></head>
+<body class="d-flex flex-column min-vh-100">
+
+<nav th:replace="~{fragments/header :: navbar}"></nav>
+
+<main class="container py-4 flex-grow-1">
+
+    <!-- Welcome Banner -->
+    <div class="card mb-4 bg-primary text-white border-0 shadow-sm">
+        <div class="card-body p-4 d-flex justify-content-between align-items-center flex-wrap">
+            <div>
+                <h2 class="fw-bold mb-1">
+                    Welcome back, <span th:text="${user != null ? user.fullName : 'Citizen'}">User</span>!
+                </h2>
+                <p class="mb-0 opacity-75">
+                    NIC: <span th:text="${user != null ? user.nicNumber : 'N/A'}" class="fw-semibold"></span> |
+                    Email: <span th:text="${user != null ? user.email : ''}"></span>
+                </p>
+            </div>
+            <div class="mt-3 mt-md-0">
+                <span class="badge bg-light text-primary fs-6 px-3 py-2 rounded-pill shadow-sm">
+                    <i class="bi bi-shield-check me-1"></i>Account Verified
+                </span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Apply Cards -->
+    <div class="row g-3 mb-4">
+        <div class="col-md-4">
+            <div class="card h-100 p-3 border-0 shadow-sm">
+                <div class="d-flex align-items-center mb-3">
+                    <div class="rounded-3 bg-primary bg-opacity-10 p-3 me-3 text-primary">
+                        <i class="bi bi-car-front fs-2"></i>
+                    </div>
+                    <div>
+                        <h5 class="fw-bold mb-0">Driver's License</h5>
+                        <small class="text-muted">New, Renewal & Lost</small>
+                    </div>
+                </div>
+                <p class="small text-muted mb-3">Apply for a new driving license, renew expired licenses, or report lost permits.</p>
+                <div class="mt-auto d-flex justify-content-between align-items-center">
+                    <a th:href="@{/license}" class="btn btn-primary btn-sm">
+                        Apply Now <i class="bi bi-arrow-right ms-1"></i>
+                    </a>
+                    <a th:href="@{/license/my-applications}" class="btn btn-outline-secondary btn-sm">
+                        My Licenses
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card h-100 p-3 border-0 shadow-sm">
+                <div class="d-flex align-items-center mb-3">
+                    <div class="rounded-3 bg-success bg-opacity-10 p-3 me-3 text-success">
+                        <i class="bi bi-globe fs-2"></i>
+                    </div>
+                    <div>
+                        <h5 class="fw-bold mb-0">Passport Services</h5>
+                        <small class="text-muted">Sri Lankan Passport</small>
+                    </div>
+                </div>
+                <p class="small text-muted mb-3">Submit new passport applications, renewals with bio-data pre-fill, or lost replacements.</p>
+                <div class="mt-auto d-flex justify-content-between align-items-center">
+                    <a th:href="@{/passport}" class="btn btn-success btn-sm">
+                        Apply Now <i class="bi bi-arrow-right ms-1"></i>
+                    </a>
+                    <a th:href="@{/passport/my-applications}" class="btn btn-outline-secondary btn-sm">
+                        My Passports
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card h-100 p-3 border-0 shadow-sm">
+                <div class="d-flex align-items-center mb-3">
+                    <div class="rounded-3 bg-info bg-opacity-10 p-3 me-3 text-info">
+                        <i class="bi bi-person-badge fs-2"></i>
+                    </div>
+                    <div>
+                        <h5 class="fw-bold mb-0">National Identity Card</h5>
+                        <small class="text-muted">Department for Registration of Persons</small>
+                    </div>
+                </div>
+                <p class="small text-muted mb-3">Online registration, renewals, lost replacements, and integrated digital payment.</p>
+                <div class="mt-auto">
+                    <a th:href="@{/nic}" class="btn btn-info text-dark btn-sm">
+                        Apply Now <i class="bi bi-arrow-right ms-1"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Application Summary Counters -->
+    <div class="row g-3 mb-4">
+        <div class="col-6 col-md-3">
+            <div class="card summary-card total p-3 bg-white">
+                <div class="small text-muted fw-semibold">TOTAL FILED</div>
+                <div class="fs-3 fw-bold text-primary" th:text="${totalApplications}">0</div>
+            </div>
+        </div>
+        <div class="col-6 col-md-3">
+            <div class="card summary-card pending p-3 bg-white">
+                <div class="small text-muted fw-semibold">UNDER REVIEW</div>
+                <div class="fs-3 fw-bold text-warning" th:text="${pendingApplications}">0</div>
+            </div>
+        </div>
+        <div class="col-6 col-md-3">
+            <div class="card summary-card approved p-3 bg-white">
+                <div class="small text-muted fw-semibold">APPROVED</div>
+                <div class="fs-3 fw-bold text-success" th:text="${approvedApplications}">0</div>
+            </div>
+        </div>
+        <div class="col-6 col-md-3">
+            <div class="card summary-card rejected p-3 bg-white">
+                <div class="small text-muted fw-semibold">ACTION NEEDED</div>
+                <div class="fs-3 fw-bold text-danger" th:text="${rejectedApplications}">0</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Applications History Section -->
+    <div class="card border-0 shadow-sm">
+        <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
+            <h5 class="fw-bold mb-0">
+                <i class="bi bi-clock-history me-2 text-primary"></i>Recent Applications
+            </h5>
+        </div>
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th class="ps-4">Reference No</th>
+                            <th>Service Category</th>
+                            <th>Category</th>
+                            <th>Date Submitted</th>
+                            <th>Status</th>
+                            <th class="text-end pe-4">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:if="${#lists.isEmpty(recentApplications)}">
+                            <td colspan="6" class="text-center text-muted py-5">
+                                <i class="bi bi-folder2-open display-6 d-block mb-2 text-secondary"></i>
+                                No applications submitted yet. Select a service above to get started.
+                            </td>
+                        </tr>
+                        <tr th:each="item : ${recentApplications}">
+                            <td class="ps-4 fw-bold">
+                                <a th:href="@{${item.viewUrl}}" th:text="${item.referenceNumber}" class="text-decoration-none text-primary"></a>
+                            </td>
+                            <td>
+                                <span th:if="${#strings.contains(item.serviceName, 'License')}" class="badge bg-primary bg-opacity-10 text-primary">
+                                    <i class="bi bi-car-front me-1"></i>Driver's License
+                                </span>
+                                <span th:if="${#strings.contains(item.serviceName, 'Passport')}" class="badge bg-success bg-opacity-10 text-success">
+                                    <i class="bi bi-globe me-1"></i>Passport Services
+                                </span>
+                                <span th:if="${#strings.contains(item.serviceName, 'NIC')}" class="badge bg-info bg-opacity-10 text-info">
+                                    <i class="bi bi-person-badge me-1"></i>NIC Services
+                                </span>
+                            </td>
+                            <td>
+                                <span class="badge bg-light text-dark border" th:text="${item.category}"></span>
+                            </td>
+                            <td th:text="${#temporals.format(item.createdAt, 'yyyy-MM-dd HH:mm')}"></td>
+                            <td>
+                                <span th:if="${#strings.toString(item.status) == 'SUBMITTED'}" class="badge bg-info text-dark">Submitted</span>
+                                <span th:if="${#strings.toString(item.status) == 'UNDER_REVIEW'}" class="badge bg-warning text-dark">Under Review</span>
+                                <span th:if="${#strings.toString(item.status) == 'APPROVED'}" class="badge bg-success">Approved</span>
+                                <span th:if="${#strings.toString(item.status) == 'REJECTED'}" class="badge bg-danger">Rejected</span>
+                                <span th:if="${#strings.toString(item.status) == 'PENDING_CORRECTION'}" class="badge bg-warning text-dark"><i class="bi bi-exclamation-diamond me-1"></i>Action Required</span>
+                                <span th:if="${#strings.toString(item.status) == 'PENDING_PAYMENT'}" class="badge bg-warning text-dark"><i class="bi bi-credit-card me-1"></i>Payment Due</span>
+                                <span th:if="${#strings.toString(item.status) == 'PAYMENT_VERIFIED'}" class="badge bg-info text-dark"><i class="bi bi-check2-circle me-1"></i>Payment Verified</span>
+                                <span th:if="${#strings.toString(item.status) == 'SHIPPED'}" class="badge bg-primary"><i class="bi bi-box-seam me-1"></i>Shipped</span>
+                                <span th:if="${#strings.toString(item.status) == 'RECEIVED'}" class="badge bg-success"><i class="bi bi-check-circle me-1"></i>Received</span>
+                            </td>
+                            <td class="text-end pe-4">
+                                <!-- Fix / Resubmit for corrections -->
+                                <a th:if="${#strings.toString(item.status) == 'PENDING_CORRECTION'}" th:href="@{${item.viewUrl}}" class="btn btn-sm btn-warning text-dark fw-bold">
+                                    <i class="bi bi-pencil-square me-1"></i>Fix / Resubmit
+                                </a>
+                                <!-- Mark as Received for shipped applications -->
+                                <form th:if="${#strings.toString(item.status) == 'SHIPPED'}"
+                                      th:action="@{/verification/received/{type}/{id}(type=${item.serviceType}, id=${item.id})}"
+                                      method="post" class="d-inline">
+                                    <button type="submit" class="btn btn-sm btn-success fw-bold"
+                                            onclick="return confirm('Confirm that you have received your document?')">
+                                        <i class="bi bi-check-circle me-1"></i>Mark as Received
+                                    </button>
+                                </form>
+                                <!-- View for all other statuses -->
+                                <a th:if="${#strings.toString(item.status) != 'PENDING_CORRECTION' and #strings.toString(item.status) != 'SHIPPED'}"
+                                   th:href="@{${item.viewUrl}}" class="btn btn-sm btn-outline-primary">
+                                    <i class="bi bi-eye me-1"></i>View
+                                </a>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+</main>
+
+<footer th:replace="~{fragments/footer :: footer}"></footer>
+<th:block th:replace="~{fragments/footer :: scripts}"></th:block>
+</body>
+</html>

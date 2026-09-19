@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/header :: head('Driving License Renewal (F2)')}"></head>
+<body class="d-flex flex-column min-vh-100">
+
+<nav th:replace="~{fragments/header :: navbar}"></nav>
+
+<main class="container py-4 flex-grow-1">
+    <div class="row justify-content-center">
+        <div class="col-lg-9">
+
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <div>
+                    <h3 class="fw-bold mb-0"><i class="bi bi-arrow-repeat me-2 text-success"></i>License Renewal (Form F2)</h3>
+                    <p class="text-muted small mb-0">Enter your existing license number to pre-fill your bio-data.</p>
+                </div>
+                <a th:href="@{/license}" class="btn btn-outline-secondary btn-sm">
+                    <i class="bi bi-arrow-left me-1"></i>Back
+                </a>
+            </div>
+
+            <div class="card border-0 shadow-sm">
+                <div class="card-body p-4">
+                    <form th:action="@{/license/apply}" th:object="${licenseDto}" method="post" enctype="multipart/form-data">
+                        <input type="hidden" th:field="*{id}">
+                        <input type="hidden" th:field="*{category}">
+
+                        <!-- License Lookup Block -->
+                        <div class="card bg-light border-0 p-3 mb-4">
+                            <label for="existingLicenseNumber" class="form-label fw-bold">Existing Driving License Number <span class="text-danger">*</span></label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="bi bi-card-text"></i></span>
+                                <input type="text" class="form-control" id="existingLicenseNumber" th:field="*{existingLicenseNumber}"
+                                       placeholder="e.g. B1234567" required>
+                                <button type="button" id="btnLookup" class="btn btn-outline-primary">
+                                    <i class="bi bi-search me-1"></i>Auto-Fill Details
+                                </button>
+                            </div>
+                            <div class="form-text" id="lookupNotice">Enter your license number and click Auto-Fill to populate saved records.</div>
+                        </div>
+
+                        <!-- Section 1: Personal Details -->
+                        <h5 class="fw-bold text-primary border-bottom pb-2 mb-3">
+                            <i class="bi bi-person-lines-fill me-2"></i>1. Applicant Bio-Data
+                        </h5>
+
+                        <div class="mb-3">
+                            <label for="fullName" class="form-label">Full Name</label>
+                            <input type="text" class="form-control" id="fullName" th:field="*{fullName}" required>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="dateOfBirth" class="form-label">Date of Birth</label>
+                                <input type="date" class="form-control" id="dateOfBirth" th:field="*{dateOfBirth}" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="phone" class="form-label">Contact Phone</label>
+                                <input type="tel" class="form-control" id="phone" th:field="*{phone}" required>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="address" class="form-label">Current Address</label>
+                            <textarea class="form-control" id="address" th:field="*{address}" rows="2" required></textarea>
+                        </div>
+
+                        <!-- Vehicle Class -->
+                        <div class="mb-3">
+                            <label for="vehicleClass" class="form-label">Vehicle Classes Covered</label>
+                            <input type="text" class="form-control" id="vehicleClass" th:field="*{vehicleClass}"
+                                   placeholder="e.g. B, B1" required>
+                        </div>
+
+                        <!-- Attachments -->
+                        <h5 class="fw-bold text-primary border-bottom pb-2 my-4">
+                            <i class="bi bi-cloud-arrow-up-fill me-2"></i>2. Required Attachments
+                        </h5>
+
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold">Recent Color Photograph <span class="text-danger">*</span></label>
+                                <input type="file" class="form-control" name="photoFile" accept="image/*">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold">Copy of Existing License / NIC <span class="text-danger">*</span></label>
+                                <input type="file" class="form-control" name="idProofFile" accept="image/*,.pdf">
+                            </div>
+                        </div>
+
+                        <!-- Actions -->
+                        <div class="d-flex justify-content-between align-items-center mt-5 pt-3 border-top">
+                            <button type="submit" th:formaction="@{/license/draft}" class="btn btn-outline-secondary">
+                                <i class="bi bi-bookmark me-1"></i>Save as Draft
+                            </button>
+                            <button type="submit" class="btn btn-success px-4 py-2 fw-semibold">
+                                <i class="bi bi-check-circle-fill me-2"></i>Submit Renewal Application
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</main>
+
+<script>
+document.getElementById('btnLookup').addEventListener('click', function() {
+    const licNo = document.getElementById('existingLicenseNumber').value.trim();
+    if (!licNo) {
+        alert('Please enter a driving license number first.');
+        return;
+    }
+    fetch('/license/prefill?licenseNumber=' + encodeURIComponent(licNo))
+        .then(response => {
+            if (!response.ok) throw new Error('No prior record found for this license number.');
+            return response.json();
+        })
+        .then(data => {
+            if (data.fullName) document.getElementById('fullName').value = data.fullName;
+            if (data.dateOfBirth) document.getElementById('dateOfBirth').value = data.dateOfBirth;
+            if (data.address) document.getElementById('address').value = data.address;
+            if (data.phone) document.getElementById('phone').value = data.phone;
+            if (data.vehicleClass) document.getElementById('vehicleClass').value = data.vehicleClass;
+            document.getElementById('lookupNotice').innerHTML = '<span class="text-success fw-bold"><i class="bi bi-check-circle me-1"></i>Details auto-filled from database!</span>';
+        })
+        .catch(err => {
+            document.getElementById('lookupNotice').innerHTML = '<span class="text-warning"><i class="bi bi-info-circle me-1"></i>' + err.message + ' Please fill in details manually.</span>';
+        });
+});
+</script>
+
+<footer th:replace="~{fragments/footer :: footer}"></footer>
+<th:block th:replace="~{fragments/footer :: scripts}"></th:block>
+</body>
+</html>
+

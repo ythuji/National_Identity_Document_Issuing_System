@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head th:replace="~{fragments/header :: head('User Management')}"></head>
+<body class="d-flex flex-column min-vh-100">
+
+<nav th:replace="~{fragments/header :: navbar}"></nav>
+
+<!-- Admin Unified Layout -->
+<div class="admin-layout">
+    <!-- Sidebar -->
+    <aside th:replace="~{fragments/sidebar :: sidebar('users')}"></aside>
+
+    <!-- Main Content Area -->
+    <main class="admin-content">
+
+        <!-- Header Title Bar -->
+        <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+            <div>
+                <h4 class="fw-bold mb-0 text-dark">
+                    <i class="bi bi-people-fill me-2 text-primary"></i>System User Management
+                </h4>
+                <p class="text-muted small mb-0">Manage citizen accounts, staff credentials, and role-based permissions.</p>
+            </div>
+            <span class="badge bg-white text-secondary border px-3 py-1.5 shadow-sm small">
+                Total Accounts: <strong class="text-dark" th:text="${#lists.size(users)}">0</strong>
+            </span>
+        </div>
+
+        <!-- Flash alerts -->
+        <div th:if="${successMessage}" class="alert alert-success alert-dismissible fade show py-2.5 px-3 small" role="alert">
+            <i class="bi bi-check-circle-fill me-1.5"></i>
+            <span th:text="${successMessage}"></span>
+            <button type="button" class="btn-close py-2.5" data-bs-dismiss="alert"></button>
+        </div>
+        <div th:if="${errorMessage}" class="alert alert-danger alert-dismissible fade show py-2.5 px-3 small" role="alert">
+            <i class="bi bi-exclamation-triangle-fill me-1.5"></i>
+            <span th:text="${errorMessage}"></span>
+            <button type="button" class="btn-close py-2.5" data-bs-dismiss="alert"></button>
+        </div>
+
+        <!-- Integrated Search & Filter Card -->
+        <div class="card border-0 shadow-sm mb-3">
+            <div class="card-body p-2.5">
+                <form th:action="@{/admin/users}" method="get" class="row g-2 align-items-center">
+                    <div class="col-md-10">
+                        <div class="input-group input-group-sm">
+                            <span class="input-group-text bg-white border-end-0"><i class="bi bi-search text-muted"></i></span>
+                            <input type="text" name="search" class="form-control border-start-0"
+                                   placeholder="Search users by name, email, or NIC number..."
+                                   th:value="${searchQuery}">
+                        </div>
+                    </div>
+                    <div class="col-md-2 d-flex gap-1.5">
+                        <button type="submit" class="btn btn-primary btn-sm w-100">
+                            <i class="bi bi-search me-1"></i>Search
+                        </button>
+                        <a th:if="${searchQuery != null and !#strings.isEmpty(searchQuery)}"
+                           th:href="@{/admin/users}" class="btn btn-outline-secondary btn-sm" title="Clear search">
+                            <i class="bi bi-x"></i>
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Users Table Card -->
+        <div class="card border-0 shadow-sm">
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-admin align-middle mb-0">
+                        <thead>
+                            <tr>
+                                <th style="width: 260px; min-width: 220px;" class="ps-3">User Profile</th>
+                                <th style="width: 140px;">NIC Number</th>
+                                <th style="width: 130px;">Phone</th>
+                                <th style="width: 190px;">Assigned Roles</th>
+                                <th style="width: 110px;">Status</th>
+                                <th style="width: 110px;">Registered</th>
+                                <th style="width: 140px;" class="text-end pe-3">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:if="${#lists.isEmpty(users)}">
+                                <td colspan="7" class="text-center text-muted py-5">
+                                    <i class="bi bi-people fs-2 d-block mb-2 text-secondary"></i>
+                                    No users found matching query.
+                                </td>
+                            </tr>
+                            <tr th:each="user : ${users}">
+                                <!-- User Profile with Avatar Circle -->
+                                <td class="ps-3">
+                                    <div class="d-flex align-items-center">
+                                        <div class="avatar-circle me-2.5" th:text="${#strings.substring(user.fullName, 0, 1).toUpperCase()}">U</div>
+                                        <div class="text-truncate" style="max-width: 190px;">
+                                            <div class="fw-bold text-dark small text-truncate" th:text="${user.fullName}">User Name</div>
+                                            <div class="text-muted small text-truncate" style="font-size: 0.75rem;" th:text="${user.email}">user@test.lk</div>
+                                        </div>
+                                    </div>
+                                </td>
+
+                                <!-- NIC -->
+                                <td class="font-monospace small" style="white-space: nowrap;"
+                                    th:text="${user.nicNumber != null ? user.nicNumber : 'N/A'}"></td>
+
+                                <!-- Phone -->
+                                <td class="small" style="white-space: nowrap;"
+                                    th:text="${user.phone != null ? user.phone : 'N/A'}"></td>
+
+                                <!-- Roles -->
+                                <td>
+                                    <div class="d-flex flex-wrap gap-1">
+                                        <span th:each="r : ${user.roles}"
+                                              th:classappend="${#strings.toString(r.roleName) == 'SUPER_ADMIN' ? 'badge-subtle-danger' : (#strings.toString(r.roleName) == 'VERIFICATION_OFFICER' ? 'badge-subtle-warning' : 'badge-subtle-primary')}"
+                                              class="badge px-2 py-0.5" style="font-size: 0.72rem;">
+                                            <span th:if="${#strings.toString(r.roleName) == 'SUPER_ADMIN'}">Super Admin</span>
+                                            <span th:if="${#strings.toString(r.roleName) == 'VERIFICATION_OFFICER'}">Officer</span>
+                                            <span th:if="${#strings.toString(r.roleName) == 'APPLICANT'}">Citizen</span>
+                                            <span th:if="${#strings.toString(r.roleName) != 'SUPER_ADMIN' and #strings.toString(r.roleName) != 'VERIFICATION_OFFICER' and #strings.toString(r.roleName) != 'APPLICANT'}" th:text="${r.roleName}"></span>
+                                        </span>
+                                    </div>
+                                </td>
+
+                                <!-- Status -->
+                                <td>
+                                    <span th:if="${user.isActive}" class="badge badge-subtle-success px-2 py-0.5" style="font-size: 0.72rem;">
+                                        <i class="bi bi-check-circle me-1"></i>Active
+                                    </span>
+                                    <span th:if="${!user.isActive}" class="badge badge-subtle-danger px-2 py-0.5" style="font-size: 0.72rem;">
+                                        <i class="bi bi-slash-circle me-1"></i>Suspended
+                                    </span>
+                                </td>
+
+                                <!-- Registered Date -->
+                                <td class="small text-muted" style="white-space: nowrap;"
+                                    th:text="${#temporals.format(user.createdAt, 'yyyy-MM-dd')}"></td>
+
+                                <!-- Actions -->
+                                <td class="text-end pe-3">
+                                    <div class="d-inline-flex gap-1.5 align-items-center">
+                                        <!-- Role Edit Modal Trigger -->
+                                        <button type="button" class="btn btn-sm btn-outline-secondary py-1 px-2"
+                                                data-bs-toggle="modal" th:data-bs-target="'#rolesModal-' + ${user.id}">
+                                            <i class="bi bi-shield-lock me-1"></i>Roles
+                                        </button>
+
+                                        <!-- Toggle Status Form -->
+                                        <form th:action="@{/admin/users/{id}/toggle-status(id=${user.id})}" method="post" class="d-inline">
+                                            <button type="submit" class="btn btn-sm py-1 px-2"
+                                                    th:classappend="${user.isActive ? 'btn-outline-danger' : 'btn-outline-success'}"
+                                                    th:title="${user.isActive ? 'Suspend User Account' : 'Activate User Account'}">
+                                                <i th:class="${user.isActive ? 'bi bi-person-x' : 'bi bi-person-check'}"></i>
+                                            </button>
+                                        </form>
+                                    </div>
+
+                                    <!-- Roles Modal -->
+                                    <div class="modal fade text-start" th:id="'rolesModal-' + ${user.id}" tabindex="-1">
+                                        <div class="modal-dialog modal-dialog-centered">
+                                            <div class="modal-content border-0 shadow">
+                                                <form th:action="@{/admin/users/{id}/roles(id=${user.id})}" method="post">
+                                                    <div class="modal-header py-2.5 px-3 border-bottom">
+                                                        <h6 class="modal-title fw-bold">Manage Roles: <span class="text-primary" th:text="${user.fullName}"></span></h6>
+                                                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                                    </div>
+                                                    <div class="modal-body p-3">
+                                                        <p class="text-muted small mb-3">Assign or revoke system privileges for this account:</p>
+                                                        <div th:each="roleName : ${allRoles}" class="form-check p-2.5 border rounded mb-2 bg-light">
+                                                            <input class="form-check-input ms-0 me-2" type="checkbox" name="roles"
+                                                                   th:value="${roleName.name()}"
+                                                                   th:id="'role-' + ${user.id} + '-' + ${roleName.name()}"
+                                                                   th:checked="${#sets.contains(user.roles.![roleName], roleName)}">
+                                                            <label class="form-check-label fw-semibold small" th:for="'role-' + ${user.id} + '-' + ${roleName.name()}">
+                                                                <span th:if="${roleName.name() == 'SUPER_ADMIN'}" class="text-danger">SUPER_ADMIN (Full Administrative Control)</span>
+                                                                <span th:if="${roleName.name() == 'VERIFICATION_OFFICER'}" class="text-warning text-dark">VERIFICATION_OFFICER (Document Assessment & Review)</span>
+                                                                <span th:if="${roleName.name() == 'APPLICANT'}" class="text-primary">APPLICANT (Citizen Document Submissions)</span>
+                                                            </label>
+                                                        </div>
+                                                    </div>
+                                                    <div class="modal-footer py-2 px-3 border-top">
+                                                        <button type="button" class="btn btn-light btn-sm" data-bs-dismiss="modal">Cancel</button>
+                                                        <button type="submit" class="btn btn-primary btn-sm fw-semibold">Save Role Permissions</button>
+                                                    </div>
+                                                </form>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+    </main>
+</div>
+
+<footer th:replace="~{fragments/footer :: footer}"></footer>
+<th:block th:replace="~{fragments/footer :: scripts}"></th:block>
+</body>
+</html>

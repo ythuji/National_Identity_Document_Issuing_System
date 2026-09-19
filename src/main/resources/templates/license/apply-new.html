@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/header :: head('New Driving License Application (F1)')}"></head>
+<body class="d-flex flex-column min-vh-100">
+
+<nav th:replace="~{fragments/header :: navbar}"></nav>
+
+<main class="container py-4 flex-grow-1">
+    <div class="row justify-content-center">
+        <div class="col-lg-9">
+
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <div>
+                    <h3 class="fw-bold mb-0"><i class="bi bi-card-checklist me-2 text-primary"></i>New Driving License (Form F1)</h3>
+                    <p class="text-muted small mb-0">Complete your bio-data and upload required documentation.</p>
+                </div>
+                <a th:href="@{/license}" class="btn btn-outline-secondary btn-sm">
+                    <i class="bi bi-arrow-left me-1"></i>Back
+                </a>
+            </div>
+
+            <!-- Error alert -->
+            <div th:if="${errorMessage}" class="alert alert-danger alert-dismissible fade show" role="alert">
+                <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                <span th:text="${errorMessage}"></span>
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+
+            <div class="card border-0 shadow-sm">
+                <div class="card-body p-4">
+                    <form th:action="@{/license/apply}" th:object="${licenseDto}" method="post" enctype="multipart/form-data">
+                        <input type="hidden" th:field="*{id}">
+                        <input type="hidden" th:field="*{category}">
+
+                        <!-- Section 1: Personal Details -->
+                        <h5 class="fw-bold text-primary border-bottom pb-2 mb-3">
+                            <i class="bi bi-person-lines-fill me-2"></i>1. Personal Details
+                        </h5>
+
+                        <div class="mb-3">
+                            <label for="fullName" class="form-label">Full Name (as in National Identity Card)</label>
+                            <input type="text" class="form-control" id="fullName" th:field="*{fullName}"
+                                   th:classappend="${#fields.hasErrors('fullName')} ? 'is-invalid' : ''" required>
+                            <div class="invalid-feedback" th:errors="*{fullName}"></div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="dateOfBirth" class="form-label">Date of Birth</label>
+                                <input type="date" class="form-control" id="dateOfBirth" th:field="*{dateOfBirth}"
+                                       th:classappend="${#fields.hasErrors('dateOfBirth')} ? 'is-invalid' : ''" required>
+                                <div class="invalid-feedback" th:errors="*{dateOfBirth}"></div>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="phone" class="form-label">Mobile Contact</label>
+                                <input type="tel" class="form-control" id="phone" th:field="*{phone}"
+                                       th:classappend="${#fields.hasErrors('phone')} ? 'is-invalid' : ''" required>
+                                <div class="invalid-feedback" th:errors="*{phone}"></div>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="address" class="form-label">Permanent Residential Address</label>
+                            <textarea class="form-control" id="address" th:field="*{address}" rows="2"
+                                      th:classappend="${#fields.hasErrors('address')} ? 'is-invalid' : ''" required></textarea>
+                            <div class="invalid-feedback" th:errors="*{address}"></div>
+                        </div>
+
+                        <!-- Section 2: Vehicle Class -->
+                        <h5 class="fw-bold text-primary border-bottom pb-2 my-4">
+                            <i class="bi bi-truck-front me-2"></i>2. Vehicle Class Selection
+                        </h5>
+
+                        <div class="mb-3">
+                            <label for="vehicleClass" class="form-label">Vehicle Classes Applied</label>
+                            <select class="form-select" id="vehicleClass" th:field="*{vehicleClass}" required>
+                                <option value="">-- Select Class --</option>
+                                <option value="A (Motorcycle up to 100cc)">A - Motorcycle up to 100cc</option>
+                                <option value="A1 (Light Motorcycle up to 125cc)">A1 - Light Motorcycle up to 125cc</option>
+                                <option value="B (Dual Purpose / Car up to 3500kg)">B - Dual Purpose / Car up to 3500kg</option>
+                                <option value="B1 (Auto Rickshaw / Three Wheeler)">B1 - Auto Rickshaw / Three Wheeler</option>
+                                <option value="C (Heavy Motor Coach)">C - Heavy Motor Coach / Bus</option>
+                                <option value="CE (Heavy Commercial Trailer)">CE - Heavy Commercial Trailer</option>
+                            </select>
+                            <div class="invalid-feedback" th:errors="*{vehicleClass}"></div>
+                        </div>
+
+                        <div class="form-check mb-3">
+                            <input class="form-check-input" type="checkbox" id="medicalCertRequired" th:field="*{medicalCertRequired}">
+                            <label class="form-check-label" for="medicalCertRequired">
+                                Includes Category B or above (National Transport Medical Institute Fitness Certificate Attached)
+                            </label>
+                        </div>
+
+                        <!-- Section 3: Document Attachments -->
+                        <h5 class="fw-bold text-primary border-bottom pb-2 my-4">
+                            <i class="bi bi-cloud-arrow-up-fill me-2"></i>3. Supporting Documents (Stored directly in Secure Database)
+                        </h5>
+
+                        <div class="row g-3">
+                            <div class="col-md-4">
+                                <label class="form-label fw-semibold">Passport-size Photograph <span class="text-danger">*</span></label>
+                                <input type="file" class="form-control" name="photoFile" accept="image/*" required>
+                                <div class="form-text">JPG or PNG (max 10MB)</div>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label fw-semibold">National Identity Card Copy <span class="text-danger">*</span></label>
+                                <input type="file" class="form-control" name="idProofFile" accept="image/*,.pdf" required>
+                                <div class="form-text">PDF or Image of NIC Front & Back</div>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label fw-semibold">Medical Fitness Certificate</label>
+                                <input type="file" class="form-control" name="medicalCertFile" accept="image/*,.pdf">
+                                <div class="form-text">NTMI Certificate (Mandatory for Cat B+)</div>
+                            </div>
+                        </div>
+
+                        <!-- Actions -->
+                        <div class="d-flex justify-content-between align-items-center mt-5 pt-3 border-top">
+                            <button type="submit" th:formaction="@{/license/draft}" class="btn btn-outline-secondary">
+                                <i class="bi bi-bookmark me-1"></i>Save as Draft
+                            </button>
+                            <button type="submit" class="btn btn-primary px-4 py-2 fw-semibold">
+                                <i class="bi bi-send-check-fill me-2"></i>Submit Application
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</main>
+
+<footer th:replace="~{fragments/footer :: footer}"></footer>
+<th:block th:replace="~{fragments/footer :: scripts}"></th:block>
+</body>
+</html>
+
