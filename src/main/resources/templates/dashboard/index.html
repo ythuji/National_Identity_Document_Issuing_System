@@ -2,139 +2,133 @@
 <html xmlns:th="http://www.thymeleaf.org"
       xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head th:replace="~{fragments/header :: head('Dashboard')}"></head>
-<body class="d-flex flex-column min-vh-100">
+<body class="dashboard-page d-flex flex-column min-vh-100">
 
 <nav th:replace="~{fragments/header :: navbar}"></nav>
 
-<main class="container py-4 flex-grow-1">
+<main class="container dashboard-shell py-4 flex-grow-1">
 
     <!-- Welcome Banner -->
-    <div class="card mb-4 bg-primary text-white border-0 shadow-sm">
-        <div class="card-body p-4 d-flex justify-content-between align-items-center flex-wrap">
+    <section class="dashboard-welcome mb-4">
+        <div class="dashboard-welcome__grid">
             <div>
-                <h2 class="fw-bold mb-1">
+                <span class="dashboard-kicker"><i class="bi bi-grid-1x2-fill"></i> Citizen service portal</span>
+                <h1 class="dashboard-welcome__title">
                     Welcome back, <span th:text="${user != null ? user.fullName : 'Citizen'}">User</span>!
-                </h2>
-                <p class="mb-0 opacity-75">
+                </h1>
+                <p class="dashboard-welcome__meta">
                     NIC: <span th:text="${user != null ? user.nicNumber : 'N/A'}" class="fw-semibold"></span> |
                     Email: <span th:text="${user != null ? user.email : ''}"></span>
                 </p>
             </div>
-            <div class="mt-3 mt-md-0">
-                <span class="badge bg-light text-primary fs-6 px-3 py-2 rounded-pill shadow-sm">
-                    <i class="bi bi-shield-check me-1"></i>Account Verified
+            <div class="dashboard-welcome__status">
+                <span class="dashboard-status-badge">
+                    <i class="bi bi-shield-check"></i><span>Account verified</span>
                 </span>
             </div>
+            <div class="dashboard-welcome__visual" aria-hidden="true">
+                <div class="dashboard-welcome__orbit dashboard-welcome__orbit--outer"></div>
+                <div class="dashboard-welcome__orbit dashboard-welcome__orbit--inner"></div>
+                <img th:src="@{/images/nidis-mark.svg}" alt="">
+                <span class="dashboard-welcome__visual-label">NIDIS<br><small>IDENTITY PORTAL</small></span>
+            </div>
         </div>
-    </div>
+        <div class="dashboard-welcome__line"></div>
+        <div class="dashboard-welcome__foot"><span>Manage your essential documents in one place</span><span><i class="bi bi-lock-fill"></i> Secure session</span></div>
+    </section>
 
     <!-- Quick Apply Cards -->
-    <div class="row g-3 mb-4">
+    <div class="dashboard-section-heading">
+        <div><span class="dashboard-kicker">01 / Services</span><h2>What do you need today?</h2></div>
+        <span class="dashboard-section-note">Start a new application or continue your journey</span>
+    </div>
+    <div class="row g-3 mb-4 dashboard-services">
         <div class="col-md-4">
-            <div class="card h-100 p-3 border-0 shadow-sm">
-                <div class="d-flex align-items-center mb-3">
-                    <div class="rounded-3 bg-primary bg-opacity-10 p-3 me-3 text-primary">
-                        <i class="bi bi-car-front fs-2"></i>
+            <div class="dashboard-service-card dashboard-service-card--blue">
+                <div class="dashboard-service-card__top">
+                    <div class="dashboard-service-card__icon"><i class="bi bi-car-front"></i>
                     </div>
-                    <div>
-                        <h5 class="fw-bold mb-0">Driver's License</h5>
-                        <small class="text-muted">New, Renewal & Lost</small>
-                    </div>
+                    <span class="dashboard-service-card__index">01</span>
                 </div>
-                <p class="small text-muted mb-3">Apply for a new driving license, renew expired licenses, or report lost permits.</p>
-                <div class="mt-auto d-flex justify-content-between align-items-center">
-                    <a th:href="@{/license}" class="btn btn-primary btn-sm">
-                        Apply Now <i class="bi bi-arrow-right ms-1"></i>
-                    </a>
-                    <a th:href="@{/license/my-applications}" class="btn btn-outline-secondary btn-sm">
-                        My Licenses
-                    </a>
+                <h3>Driver's License <span class="dashboard-service-card__tag">POPULAR</span></h3>
+                <p>New, renewal, and lost license services with guided application steps.</p>
+                <div class="dashboard-service-card__actions">
+                    <a th:href="@{/license}" class="btn btn-primary btn-sm">Apply now <i class="bi bi-arrow-up-right ms-1"></i></a>
+                    <a th:href="@{/license/my-applications}" class="dashboard-text-link">My licenses <i class="bi bi-arrow-right"></i></a>
                 </div>
             </div>
         </div>
 
         <div class="col-md-4">
-            <div class="card h-100 p-3 border-0 shadow-sm">
-                <div class="d-flex align-items-center mb-3">
-                    <div class="rounded-3 bg-success bg-opacity-10 p-3 me-3 text-success">
-                        <i class="bi bi-globe fs-2"></i>
-                    </div>
-                    <div>
-                        <h5 class="fw-bold mb-0">Passport Services</h5>
-                        <small class="text-muted">Sri Lankan Passport</small>
-                    </div>
+            <div class="dashboard-service-card dashboard-service-card--teal">
+                <div class="dashboard-service-card__top">
+                    <div class="dashboard-service-card__icon"><i class="bi bi-globe"></i></div>
+                    <span class="dashboard-service-card__index">02</span>
                 </div>
-                <p class="small text-muted mb-3">Submit new passport applications, renewals with bio-data pre-fill, or lost replacements.</p>
-                <div class="mt-auto d-flex justify-content-between align-items-center">
-                    <a th:href="@{/passport}" class="btn btn-success btn-sm">
-                        Apply Now <i class="bi bi-arrow-right ms-1"></i>
-                    </a>
-                    <a th:href="@{/passport/my-applications}" class="btn btn-outline-secondary btn-sm">
-                        My Passports
-                    </a>
+                <h3>Passport Services <span class="dashboard-service-card__tag">TRAVEL</span></h3>
+                <p>Apply for a new passport, renew with pre-filled details, or replace a lost document.</p>
+                <div class="dashboard-service-card__actions">
+                    <a th:href="@{/passport}" class="btn btn-success btn-sm">Apply now <i class="bi bi-arrow-up-right ms-1"></i></a>
+                    <a th:href="@{/passport/my-applications}" class="dashboard-text-link">My passports <i class="bi bi-arrow-right"></i></a>
                 </div>
             </div>
         </div>
 
         <div class="col-md-4">
-            <div class="card h-100 p-3 border-0 shadow-sm">
-                <div class="d-flex align-items-center mb-3">
-                    <div class="rounded-3 bg-info bg-opacity-10 p-3 me-3 text-info">
-                        <i class="bi bi-person-badge fs-2"></i>
-                    </div>
-                    <div>
-                        <h5 class="fw-bold mb-0">National Identity Card</h5>
-                        <small class="text-muted">Department for Registration of Persons</small>
-                    </div>
+            <div class="dashboard-service-card dashboard-service-card--gold">
+                <div class="dashboard-service-card__top">
+                    <div class="dashboard-service-card__icon"><i class="bi bi-person-badge"></i></div>
+                    <span class="dashboard-service-card__index">03</span>
                 </div>
-                <p class="small text-muted mb-3">Online registration, renewals, lost replacements, and integrated digital payment.</p>
-                <div class="mt-auto">
-                    <a th:href="@{/nic}" class="btn btn-info text-dark btn-sm">
-                        Apply Now <i class="bi bi-arrow-right ms-1"></i>
-                    </a>
+                <h3>National Identity Card <span class="dashboard-service-card__tag">ESSENTIAL</span></h3>
+                <p>Register, renew, or replace your NIC with secure document submission and payment.</p>
+                <div class="dashboard-service-card__actions">
+                    <a th:href="@{/nic}" class="btn btn-warning text-dark btn-sm">Apply now <i class="bi bi-arrow-up-right ms-1"></i></a>
                 </div>
             </div>
         </div>
     </div>
 
     <!-- Application Summary Counters -->
-    <div class="row g-3 mb-4">
+    <div class="dashboard-section-heading dashboard-section-heading--compact">
+        <div><span class="dashboard-kicker">02 / Overview</span><h2>Your application pulse</h2></div>
+    </div>
+    <div class="row g-3 mb-4 dashboard-metrics">
         <div class="col-6 col-md-3">
-            <div class="card summary-card total p-3 bg-white">
-                <div class="small text-muted fw-semibold">TOTAL FILED</div>
-                <div class="fs-3 fw-bold text-primary" th:text="${totalApplications}">0</div>
+            <div class="summary-card total">
+                <div class="summary-card__label"><i class="bi bi-files"></i>Total filed</div>
+                <div class="summary-card__value" th:text="${totalApplications}">0</div>
             </div>
         </div>
         <div class="col-6 col-md-3">
-            <div class="card summary-card pending p-3 bg-white">
-                <div class="small text-muted fw-semibold">UNDER REVIEW</div>
-                <div class="fs-3 fw-bold text-warning" th:text="${pendingApplications}">0</div>
+            <div class="summary-card pending">
+                <div class="summary-card__label"><i class="bi bi-hourglass-split"></i>Under review</div>
+                <div class="summary-card__value" th:text="${pendingApplications}">0</div>
             </div>
         </div>
         <div class="col-6 col-md-3">
-            <div class="card summary-card approved p-3 bg-white">
-                <div class="small text-muted fw-semibold">APPROVED</div>
-                <div class="fs-3 fw-bold text-success" th:text="${approvedApplications}">0</div>
+            <div class="summary-card approved">
+                <div class="summary-card__label"><i class="bi bi-check2-circle"></i>Approved</div>
+                <div class="summary-card__value" th:text="${approvedApplications}">0</div>
             </div>
         </div>
         <div class="col-6 col-md-3">
-            <div class="card summary-card rejected p-3 bg-white">
-                <div class="small text-muted fw-semibold">ACTION NEEDED</div>
-                <div class="fs-3 fw-bold text-danger" th:text="${rejectedApplications}">0</div>
+            <div class="summary-card rejected">
+                <div class="summary-card__label"><i class="bi bi-exclamation-circle"></i>Action needed</div>
+                <div class="summary-card__value" th:text="${rejectedApplications}">0</div>
             </div>
         </div>
     </div>
 
     <!-- Applications History Section -->
-    <div class="card border-0 shadow-sm">
-        <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
-            <h5 class="fw-bold mb-0">
-                <i class="bi bi-clock-history me-2 text-primary"></i>Recent Applications
-            </h5>
+    <section class="dashboard-history">
+        <div class="dashboard-history__header">
+            <div><span class="dashboard-kicker">03 / Activity</span><h2><i class="bi bi-clock-history"></i> Recent applications</h2></div>
+            <span class="dashboard-section-note">Your latest submissions and status updates</span>
         </div>
-        <div class="card-body p-0">
+        <div class="dashboard-history__body">
             <div class="table-responsive">
-                <table class="table table-hover align-middle mb-0">
+                <table class="table table-hover align-middle mb-0 dashboard-table">
                     <thead class="table-light">
                         <tr>
                             <th class="ps-4">Reference No</th>
@@ -154,7 +148,7 @@
                         </tr>
                         <tr th:each="item : ${recentApplications}">
                             <td class="ps-4 fw-bold">
-                                <a th:href="@{${item.viewUrl}}" th:text="${item.referenceNumber}" class="text-decoration-none text-primary"></a>
+                                <a th:href="@{${item.viewUrl}}" th:text="${item.referenceNumber}" class="dashboard-reference text-decoration-none"></a>
                             </td>
                             <td>
                                 <span th:if="${#strings.contains(item.serviceName, 'License')}" class="badge bg-primary bg-opacity-10 text-primary">
@@ -170,7 +164,7 @@
                             <td>
                                 <span class="badge bg-light text-dark border" th:text="${item.category}"></span>
                             </td>
-                            <td th:text="${#temporals.format(item.createdAt, 'yyyy-MM-dd HH:mm')}"></td>
+                            <td class="dashboard-date" th:text="${#temporals.format(item.createdAt, 'dd MMM yyyy, HH:mm')}"></td>
                             <td>
                                 <span th:if="${#strings.toString(item.status) == 'SUBMITTED'}" class="badge bg-info text-dark">Submitted</span>
                                 <span th:if="${#strings.toString(item.status) == 'UNDER_REVIEW'}" class="badge bg-warning text-dark">Under Review</span>
@@ -207,7 +201,7 @@
                 </table>
             </div>
         </div>
-    </div>
+    </section>
 
 </main>
 

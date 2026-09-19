@@ -1,19 +1,41 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head th:replace="~{fragments/header :: head('Login')}"></head>
-<body class="d-flex flex-column min-vh-100">
+<body class="auth-page">
+<main class="auth-layout">
+    <section class="auth-showcase">
+        <div class="auth-showcase__glow"></div>
+        <div class="auth-showcase__content">
+            <a class="auth-brand" th:href="@{/login}" aria-label="NIDIS home">
+                <img th:src="@{/images/nidis-mark.svg}" alt="NIDIS logo">
+                <span>NIDIS<small>National Identity Document Issuing System</small></span>
+            </a>
 
-<nav th:replace="~{fragments/header :: navbar}"></nav>
+            <div class="auth-showcase__message">
+                <span class="auth-eyebrow"><i class="bi bi-stars"></i> Trusted digital services</span>
+                <h1>Your identity,<br><em>securely in hand.</em></h1>
+                <p>One secure place to apply for, manage, and track your national identity documents.</p>
+            </div>
 
-<main class="container my-auto py-5">
-    <div class="row justify-content-center">
-        <div class="col-md-5 col-lg-4">
-            <div class="card auth-card">
-                <div class="card-header">
-                    <h4 class="mb-0 fw-bold"><i class="bi bi-shield-lock-fill me-2"></i>Sign In</h4>
-                    <p class="small mb-0 opacity-75">National Identity Document Issuing System</p>
-                </div>
-                <div class="card-body p-4">
+            <div class="auth-trust-list" aria-label="NIDIS service benefits">
+                <div><i class="bi bi-shield-check"></i><span><strong>Protected by design</strong><small>Your information is handled with care.</small></span></div>
+                <div><i class="bi bi-clock-history"></i><span><strong>Clear progress</strong><small>Track every application milestone.</small></span></div>
+            </div>
+        </div>
+        <div class="auth-showcase__footer"><span>EST. 2026</span><span>SECURE ACCESS PORTAL</span></div>
+    </section>
+
+    <section class="auth-form-panel">
+        <div class="auth-form-wrap">
+            <div class="auth-mobile-brand">
+                <img th:src="@{/images/nidis-mark.svg}" alt="NIDIS logo">
+                <span>NIDIS</span>
+            </div>
+            <div class="auth-heading">
+                <span class="auth-heading__label">Welcome back</span>
+                <h2>Sign in to your account</h2>
+                <p>Enter your details to continue to the NIDIS portal.</p>
+            </div>
 
                     <!-- Error Alert -->
                     <div th:if="${errorMessage}" class="alert alert-danger alert-dismissible fade show" role="alert">
@@ -29,52 +51,47 @@
                         <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
                     </div>
 
-                    <form th:action="@{/login}" method="post">
+                    <form th:action="@{/login}" method="post" class="auth-form">
                         <!-- CSRF Token handled automatically by Spring Security / Thymeleaf -->
-                        <div class="mb-3">
+                        <div class="mb-4">
                             <label for="email" class="form-label">Email Address</label>
                             <div class="input-group">
-                                <span class="input-group-text"><i class="bi bi-envelope"></i></span>
+                                <span class="input-group-text" aria-hidden="true"><i class="bi bi-envelope"></i></span>
                                 <input type="email" class="form-control" id="email" name="email"
                                        placeholder="name@example.com" required autofocus>
                             </div>
                         </div>
 
-                        <div class="mb-3">
+                        <div class="mb-4">
                             <div class="d-flex justify-content-between align-items-center mb-1">
                                 <label for="password" class="form-label mb-0">Password</label>
                                 <a th:href="@{/forgot-password}" class="small text-decoration-none">Forgot?</a>
                             </div>
                             <div class="input-group">
-                                <span class="input-group-text"><i class="bi bi-key"></i></span>
+                                <span class="input-group-text" aria-hidden="true"><i class="bi bi-key"></i></span>
                                 <input type="password" class="form-control" id="password" name="password"
                                        placeholder="••••••••" required>
                             </div>
                         </div>
 
                         <div class="d-grid mt-4">
-                            <button type="submit" class="btn btn-primary py-2 fw-semibold">
-                                <i class="bi bi-box-arrow-in-right me-2"></i>Sign In
+                            <button type="submit" class="btn btn-primary auth-submit">
+                                <span>Sign In</span><i class="bi bi-arrow-up-right"></i>
                             </button>
                         </div>
                     </form>
 
                     <hr class="my-4">
 
-                    <div class="text-center">
+                    <div class="text-center auth-register">
                         <p class="text-muted small mb-0">
                             Don't have an account?
                             <a th:href="@{/register}" class="fw-bold text-primary text-decoration-none">Create Account</a>
                         </p>
                     </div>
 
-                </div>
             </div>
-        </div>
-    </div>
 </main>
-
-<footer th:replace="~{fragments/footer :: footer}"></footer>
 <th:block th:replace="~{fragments/footer :: scripts}"></th:block>
 </body>
 </html>

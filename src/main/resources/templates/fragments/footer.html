@@ -2,18 +2,24 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <body>
 
-<footer th:fragment="footer" class="footer bg-dark text-light py-4 mt-auto">
+<footer th:fragment="footer" class="footer nidis-footer mt-auto">
     <div class="container">
-        <div class="row">
-            <div class="col-md-6">
-                <h6 class="fw-bold"><i class="bi bi-shield-lock-fill me-2"></i>NIDIS</h6>
-                <p class="small text-muted mb-0">National Identity Document Issuing Service</p>
-                <p class="small text-muted">Secure. Efficient. Digital.</p>
-            </div>
-            <div class="col-md-6 text-md-end">
-                <p class="small text-muted mb-0">&copy; 2026 NIDIS. All rights reserved.</p>
-                <p class="small text-muted">SE2030 — Software Engineering Project</p>
-            </div>
+        <div class="nidis-footer__main">
+            <div class="nidis-footer__brand"><img th:src="@{/images/nidis-mark.svg}" alt="NIDIS logo"><span>NIDIS</span></div>
+            <span class="nidis-footer__tagline">Secure digital identity services</span>
+            <nav class="nidis-footer__links" aria-label="Footer links">
+                <a th:href="@{/license}">License</a>
+                <a th:href="@{/passport}">Passport</a>
+                <a th:href="@{/nic}">NIC</a>
+                <a th:href="@{/dashboard}">Dashboard</a>
+                <a th:href="@{/payment/my-payments}">Payments</a>
+                <a th:href="@{/forgot-password}">Password help</a>
+            </nav>
+            <span class="nidis-footer__secure"><i class="bi bi-shield-check"></i> Secure access</span>
+        </div>
+        <div class="nidis-footer__bottom">
+            <span>&copy; 2026 NIDIS. All rights reserved.</span>
+            <span>SE2030 &middot; Secure. Efficient. Digital.</span>
         </div>
     </div>
 </footer>

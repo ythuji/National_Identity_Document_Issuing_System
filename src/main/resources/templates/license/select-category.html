@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head th:replace="~{fragments/header :: head('Driving License Services')}"></head>
-<body class="d-flex flex-column min-vh-100">
+<body class="portal-page d-flex flex-column min-vh-100">
 
 <nav th:replace="~{fragments/header :: navbar}"></nav>
 
@@ -15,7 +15,7 @@
     </div>
 
     <div class="row g-4 justify-content-center">
-        <!-- New License (F1) -->
+        <!-- New License -->
         <div class="col-md-4">
             <div class="card h-100 p-4 border-0 shadow-sm text-center">
                 <div class="mb-3">
@@ -23,10 +23,11 @@
                         <i class="bi bi-file-earmark-plus display-5"></i>
                     </div>
                 </div>
-                <h4 class="fw-bold">New License (F1)</h4>
+                <h4 class="fw-bold">New License</h4>
                 <p class="text-muted small mb-4">
                     For first-time applicants applying for a learner's permit or new permanent driver's license. Medical certificate required.
                 </p>
+                <div class="badge bg-light text-dark border mb-4">Fee: LKR 2,500.00</div>
                 <div class="mt-auto">
                     <a th:href="@{/license/apply/new}" class="btn btn-primary w-100 py-2">
                         Apply for New License <i class="bi bi-arrow-right ms-1"></i>
@@ -35,7 +36,7 @@
             </div>
         </div>
 
-        <!-- License Renewal (F2) -->
+        <!-- License Renewal -->
         <div class="col-md-4">
             <div class="card h-100 p-4 border-0 shadow-sm text-center">
                 <div class="mb-3">
@@ -43,10 +44,11 @@
                         <i class="bi bi-arrow-repeat display-5"></i>
                     </div>
                 </div>
-                <h4 class="fw-bold">License Renewal (F2)</h4>
+                <h4 class="fw-bold">License Renewal</h4>
                 <p class="text-muted small mb-4">
                     Renew an existing expired or expiring driving license. Auto-lookup pre-fills existing details by your license number.
                 </p>
+                <div class="badge bg-light text-dark border mb-4">Fee: LKR 1,500.00</div>
                 <div class="mt-auto">
                     <a th:href="@{/license/apply/renewal}" class="btn btn-success w-100 py-2">
                         Renew Existing License <i class="bi bi-arrow-right ms-1"></i>
@@ -55,7 +57,7 @@
             </div>
         </div>
 
-        <!-- Lost / Replacement (F3) -->
+        <!-- Lost / Replacement -->
         <div class="col-md-4">
             <div class="card h-100 p-4 border-0 shadow-sm text-center">
                 <div class="mb-3">
@@ -63,10 +65,11 @@
                         <i class="bi bi-shield-exclamation display-5"></i>
                     </div>
                 </div>
-                <h4 class="fw-bold">Lost / Duplicate (F3)</h4>
+                <h4 class="fw-bold">Lost / Duplicate</h4>
                 <p class="text-muted small mb-4">
                     Obtain a duplicate driving license in case of loss, theft, or damage. Police station incident report mandatory.
                 </p>
+                <div class="badge bg-light text-dark border mb-4">Fee: LKR 2,000.00</div>
                 <div class="mt-auto">
                     <a th:href="@{/license/apply/lost}" class="btn btn-warning w-100 py-2 text-dark">
                         Apply for Replacement <i class="bi bi-arrow-right ms-1"></i>

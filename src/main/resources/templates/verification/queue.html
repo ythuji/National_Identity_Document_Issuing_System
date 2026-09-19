@@ -2,7 +2,7 @@
 <html xmlns:th="http://www.thymeleaf.org"
       xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head th:replace="~{fragments/header :: head('Verification Queue')}"></head>
-<body class="d-flex flex-column min-vh-100">
+<body class="officer-page d-flex flex-column min-vh-100">
 
 <nav th:replace="~{fragments/header :: navbar}"></nav>
 
@@ -10,6 +10,7 @@
 <div class="admin-layout" sec:authorize="hasAuthority('SUPER_ADMIN')">
     <aside th:replace="~{fragments/sidebar :: sidebar('queue')}"></aside>
     <main class="admin-content">
+        <header th:replace="~{fragments/admin-topbar :: topbar('Verification Queue')}"></header>
         <div th:replace="~{::queueBody}"></div>
     </main>
 </div>
@@ -125,7 +126,7 @@
     <div class="card border-0 shadow-sm">
         <div class="card-body p-0">
             <div class="table-responsive">
-                <table class="table table-admin align-middle mb-0">
+                <table class="table table-admin align-middle mb-0 officer-queue-table">
                     <thead>
                         <tr>
                             <th style="width: 140px;" class="ps-3">Reference No</th>

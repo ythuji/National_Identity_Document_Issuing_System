@@ -2,7 +2,7 @@
 <html xmlns:th="http://www.thymeleaf.org"
       xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head th:replace="~{fragments/header :: head('Document Verification & Assessment')}"></head>
-<body class="d-flex flex-column min-vh-100">
+<body class="officer-page d-flex flex-column min-vh-100">
 
 <nav th:replace="~{fragments/header :: navbar}"></nav>
 
@@ -10,6 +10,7 @@
 <div class="admin-layout" sec:authorize="hasAuthority('SUPER_ADMIN')">
     <aside th:replace="~{fragments/sidebar :: sidebar('queue')}"></aside>
     <main class="admin-content">
+        <header th:replace="~{fragments/admin-topbar :: topbar('Application Review')}"></header>
         <div th:replace="~{::reviewBody}"></div>
     </main>
 </div>

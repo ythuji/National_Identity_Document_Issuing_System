@@ -1,9 +1,7 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head th:replace="~{fragments/header :: head('System Audit Log')}"></head>
-<body class="d-flex flex-column min-vh-100">
-
-<nav th:replace="~{fragments/header :: navbar}"></nav>
+<body class="admin-page">
 
 <!-- Admin Unified Layout -->
 <div class="admin-layout">
@@ -12,6 +10,7 @@
 
     <!-- Main Content Area -->
     <main class="admin-content">
+        <header th:replace="~{fragments/admin-topbar :: topbar('Security Audit')}"></header>
 
         <!-- Header Title Bar -->
         <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">

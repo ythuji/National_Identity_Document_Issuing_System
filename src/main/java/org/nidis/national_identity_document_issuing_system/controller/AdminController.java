@@ -84,8 +84,8 @@ public class AdminController {
                 .sum();
 
         List<AuditLog> recentLogs = auditLogService.getRecentLogs();
-        if (recentLogs.size() > 8) {
-            recentLogs = recentLogs.subList(0, 8);
+        if (recentLogs.size() > 3) {
+            recentLogs = recentLogs.subList(0, 3);
         }
 
         model.addAttribute("totalUsers", totalUsers);

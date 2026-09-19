@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<body>
+
+<header th:fragment="topbar(pageTitle)" class="admin-topbar">
+    <!-- Left: breadcrumb / page title -->
+    <div class="admin-topbar__left">
+        <nav aria-label="breadcrumb" class="mb-0">
+            <ol class="breadcrumb mb-0">
+                <li class="breadcrumb-item">
+                    <a th:href="@{/admin/dashboard}" class="admin-topbar__home-link">
+                        <i class="bi bi-house-door-fill"></i>
+                    </a>
+                </li>
+                <li class="breadcrumb-item active admin-topbar__page" th:text="${pageTitle}">Page</li>
+            </ol>
+        </nav>
+    </div>
+
+    <!-- Right: status pill + user chip -->
+    <div class="admin-topbar__right">
+        <span class="admin-topbar__status">
+            <i class="bi bi-circle-fill"></i>Online
+        </span>
+        <span class="admin-topbar__divider"></span>
+        <span class="admin-topbar__user">
+            <i class="bi bi-person-fill"></i>
+            <span sec:authentication="principal.username">Administrator</span>
+        </span>
+    </div>
+</header>
+
+</body>
+</html>

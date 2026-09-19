@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
-<head th:replace="~{fragments/header :: head('Driving License Renewal (F2)')}"></head>
-<body class="d-flex flex-column min-vh-100">
+<head th:replace="~{fragments/header :: head('Driving License Renewal')}"></head>
+<body class="portal-page d-flex flex-column min-vh-100">
 
 <nav th:replace="~{fragments/header :: navbar}"></nav>
 
@@ -11,7 +11,7 @@
 
             <div class="d-flex justify-content-between align-items-center mb-3">
                 <div>
-                    <h3 class="fw-bold mb-0"><i class="bi bi-arrow-repeat me-2 text-success"></i>License Renewal (Form F2)</h3>
+                    <h3 class="fw-bold mb-0"><i class="bi bi-arrow-repeat me-2 text-success"></i>License Renewal</h3>
                     <p class="text-muted small mb-0">Enter your existing license number to pre-fill your bio-data.</p>
                 </div>
                 <a th:href="@{/license}" class="btn btn-outline-secondary btn-sm">
