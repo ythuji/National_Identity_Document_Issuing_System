@@ -92,7 +92,14 @@ public class PassportController {
             return "redirect:/passport/view/" + application.getId();
         } catch (Exception ex) {
             log.error("Failed to submit passport application: ", ex);
-            model.addAttribute("errorMessage", ex.getMessage());
+            String msg = ex.getMessage() != null ? ex.getMessage() : "Failed to submit passport application.";
+            if ((dto.getCategory() == ApplicationCategory.RENEWAL || dto.getCategory() == ApplicationCategory.LOST) && msg.toLowerCase().contains("passport")) {
+                bindingResult.rejectValue("existingPassportNumber", "error.passportDto", msg);
+            } else if (dto.getCategory() == ApplicationCategory.LOST && msg.toLowerCase().contains("police")) {
+                bindingResult.rejectValue("policeReportRef", "error.passportDto", msg);
+            } else {
+                bindingResult.rejectValue("fullName", "error.passportDto", msg);
+            }
             model.addAttribute("category", dto.getCategory());
             if (dto.getCategory() == ApplicationCategory.RENEWAL) return "passport/apply-renewal";
             if (dto.getCategory() == ApplicationCategory.LOST) return "passport/apply-lost";

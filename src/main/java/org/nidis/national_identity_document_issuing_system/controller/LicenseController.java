@@ -92,7 +92,14 @@ public class LicenseController {
             return "redirect:/license/view/" + application.getId();
         } catch (Exception ex) {
             log.error("Failed to submit license application: ", ex);
-            model.addAttribute("errorMessage", ex.getMessage());
+            String msg = ex.getMessage() != null ? ex.getMessage() : "Failed to submit license application.";
+            if ((dto.getCategory() == ApplicationCategory.RENEWAL || dto.getCategory() == ApplicationCategory.LOST) && msg.toLowerCase().contains("license")) {
+                bindingResult.rejectValue("existingLicenseNumber", "error.licenseDto", msg);
+            } else if (dto.getCategory() == ApplicationCategory.LOST && msg.toLowerCase().contains("police")) {
+                bindingResult.rejectValue("policeReportRef", "error.licenseDto", msg);
+            } else {
+                bindingResult.rejectValue("fullName", "error.licenseDto", msg);
+            }
             model.addAttribute("category", dto.getCategory());
             if (dto.getCategory() == ApplicationCategory.RENEWAL) return "license/apply-renewal";
             if (dto.getCategory() == ApplicationCategory.LOST) return "license/apply-lost";

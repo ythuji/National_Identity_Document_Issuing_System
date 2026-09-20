@@ -58,6 +58,11 @@
                         <tr th:each="app : ${applications}">
                             <td class="ps-4 fw-bold">
                                 <a th:href="@{/passport/view/{id}(id=${app.id})}" th:text="${app.referenceNumber}" class="text-decoration-none text-success"></a>
+                                <div th:if="${app.issuedPassportNumber}" class="small mt-1">
+                                    <span class="badge bg-success bg-opacity-10 text-success border border-success-subtle font-monospace">
+                                        <i class="bi bi-patch-check-fill me-1"></i><span th:text="${app.issuedPassportNumber}"></span>
+                                    </span>
+                                </div>
                             </td>
                             <td>
                                 <span class="badge bg-light text-dark border" th:text="${app.category}"></span>

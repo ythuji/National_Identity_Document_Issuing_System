@@ -152,9 +152,12 @@ public class NicService {
 
     public Optional<NicApplication> prefillBioData(String existingNicNumber) {
         if (existingNicNumber == null || existingNicNumber.isBlank()) return Optional.empty();
-        Optional<NicApplication> byNic = nicRepository.findFirstByExistingNicNumberOrderByCreatedAtDesc(existingNicNumber.trim());
+        String trimmed = existingNicNumber.trim();
+        Optional<NicApplication> byIssued = nicRepository.findTopByIssuedNicNumberOrderByCreatedAtDesc(trimmed);
+        if (byIssued.isPresent()) return byIssued;
+        Optional<NicApplication> byNic = nicRepository.findFirstByExistingNicNumberOrderByCreatedAtDesc(trimmed);
         if (byNic.isPresent()) return byNic;
-        return nicRepository.findByReferenceNumber(existingNicNumber.trim());
+        return nicRepository.findByReferenceNumber(trimmed);
     }
 
     public List<NicApplication> getApplicationsByUser(Long userId) {

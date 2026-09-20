@@ -152,6 +152,27 @@ class NationalIdentityDocumentIssuingSystemApplicationTests {
         assertEquals(ApplicationStatus.APPROVED, approvedApp.getStatus());
         assertEquals("Bio-data verified with Birth Certificate. Approved.", approvedApp.getOfficerComment());
 
+        // 5b. Officer Verifies Payment and Ships Document (PAYMENT_VERIFY)
+        VerificationDecisionDto shipDecision = VerificationDecisionDto.builder()
+                .applicationType(ApplicationType.NIC)
+                .applicationId(application.getId())
+                .action("PAYMENT_VERIFY")
+                .officerComment("Payment verified and smart NIC card dispatched to citizen address.")
+                .build();
+
+        verificationService.processDecision(shipDecision, officer);
+
+        NicApplication shippedApp = nicService.getApplicationById(application.getId()).orElseThrow();
+        assertEquals(ApplicationStatus.SHIPPED, shippedApp.getStatus());
+        assertNotNull(shippedApp.getIssuedNicNumber(), "Issued NIC number must be automatically generated");
+        assertEquals(12, shippedApp.getIssuedNicNumber().length(), "Generated NIC must be 12 digits");
+        assertTrue(shippedApp.getIssuedNicNumber().startsWith("2001"), "NIC must start with applicant birth year 2001");
+
+        // Verify citizen can use this issued NIC number to look up and prefill for renewal or lost claims
+        var prefillRecord = nicService.prefillBioData(shippedApp.getIssuedNicNumber());
+        assertTrue(prefillRecord.isPresent(), "Citizen must be able to lookup bio-data using issued NIC number");
+        assertEquals("YOGATHAS THUJIKOSHAN", prefillRecord.get().getFullName());
+
         // 6. Super Admin User & Audit Logs
         User admin = userRepository.findByEmail("admin@nidis.gov.lk").orElseThrow();
         List<AuditLog> auditLogs = auditLogService.getRecentLogs();

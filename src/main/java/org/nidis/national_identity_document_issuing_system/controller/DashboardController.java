@@ -77,6 +77,7 @@ public class DashboardController {
                             .createdAt(app.getCreatedAt())
                             .status(app.getStatus())
                             .viewUrl("/license/view/" + app.getId())
+                            .documentNumber(app.getIssuedLicenseNumber() != null ? app.getIssuedLicenseNumber() : app.getExistingLicenseNumber())
                             .build());
                 }
             }
@@ -92,6 +93,7 @@ public class DashboardController {
                             .createdAt(app.getCreatedAt())
                             .status(app.getStatus())
                             .viewUrl("/passport/view/" + app.getId())
+                            .documentNumber(app.getIssuedPassportNumber() != null ? app.getIssuedPassportNumber() : app.getExistingPassportNumber())
                             .build());
                 }
             }
@@ -107,6 +109,7 @@ public class DashboardController {
                             .createdAt(app.getCreatedAt())
                             .status(app.getStatus())
                             .viewUrl("/nic/view/" + app.getId())
+                            .documentNumber(app.getIssuedNicNumber() != null ? app.getIssuedNicNumber() : app.getExistingNicNumber())
                             .build());
                 }
             }

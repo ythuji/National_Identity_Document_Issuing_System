@@ -14,6 +14,8 @@ public interface PassportApplicationRepository extends JpaRepository<PassportApp
     List<PassportApplication> findByUserIdOrderByCreatedAtDesc(Long userId);
     Optional<PassportApplication> findByReferenceNumber(String referenceNumber);
     Optional<PassportApplication> findTopByExistingPassportNumberOrderByCreatedAtDesc(String existingPassportNumber);
+    Optional<PassportApplication> findTopByIssuedPassportNumberOrderByCreatedAtDesc(String issuedPassportNumber);
+    boolean existsByIssuedPassportNumber(String issuedPassportNumber);
     List<PassportApplication> findByStatusInOrderByCreatedAtAsc(List<ApplicationStatus> statuses);
     Optional<PassportApplication> findFirstByUserIdAndCategoryAndIsDraftTrue(Long userId, ApplicationCategory category);
     long countByUserId(Long userId);

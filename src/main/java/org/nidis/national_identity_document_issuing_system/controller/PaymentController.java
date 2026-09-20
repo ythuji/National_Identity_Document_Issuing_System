@@ -75,7 +75,12 @@ public class PaymentController {
             return "redirect:/payment/receipt/" + txn.getTransactionId();
         } catch (Exception ex) {
             log.error("Payment processing error: ", ex);
-            model.addAttribute("errorMessage", ex.getMessage());
+            String msg = ex.getMessage() != null ? ex.getMessage() : "Payment was declined by issuing bank.";
+            if (msg.toLowerCase().contains("cvv")) {
+                bindingResult.rejectValue("cvv", "error.paymentDto", msg);
+            } else {
+                bindingResult.rejectValue("cardNumber", "error.paymentDto", msg);
+            }
             return "payment/checkout";
         }
     }

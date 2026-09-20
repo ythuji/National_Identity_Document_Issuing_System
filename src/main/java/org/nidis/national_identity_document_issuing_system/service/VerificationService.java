@@ -20,6 +20,7 @@ import org.nidis.national_identity_document_issuing_system.repository.LicenseApp
 import org.nidis.national_identity_document_issuing_system.repository.NicApplicationRepository;
 import org.nidis.national_identity_document_issuing_system.repository.PassportApplicationRepository;
 import org.nidis.national_identity_document_issuing_system.repository.PaymentTransactionRepository;
+import org.nidis.national_identity_document_issuing_system.repository.UserRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -36,6 +37,9 @@ public class VerificationService {
     private final PassportApplicationRepository passportRepository;
     private final NicApplicationRepository nicRepository;
     private final PaymentTransactionRepository paymentRepository;
+    private final UserRepository userRepository;
+    private final DocumentNumberGeneratorService documentNumberGenerator;
+    private final EmailService emailService;
     private final FileStorageService fileStorageService;
     private final NotificationService notificationService;
     private final AuditLogService auditLogService;
@@ -208,6 +212,10 @@ public class VerificationService {
 
         String refNo = "";
         Long userId = null;
+        String citizenEmail = "";
+        String citizenName = "";
+        String issuedDocNumber = null;
+        String docTypeDisplayName = "";
 
         switch (dto.getApplicationType()) {
             case LICENSE -> {
@@ -216,11 +224,28 @@ public class VerificationService {
                 validateWorkflowTransition(app.getStatus(), newStatus,
                     paymentRepository.findFirstByApplicationIdAndApplicationTypeOrderByCreatedAtDesc(app.getId(), ApplicationType.LICENSE)
                         .map(PaymentTransaction::getPaymentStatus).orElse(PaymentStatus.PENDING));
+
+                docTypeDisplayName = "Driving License";
+                refNo = app.getReferenceNumber();
+                userId = app.getUser().getId();
+                citizenEmail = app.getUser().getEmail();
+                citizenName = app.getFullName();
+
+                if (newStatus == ApplicationStatus.SHIPPED) {
+                    issuedDocNumber = app.getIssuedLicenseNumber();
+                    if (issuedDocNumber == null || issuedDocNumber.isBlank()) {
+                        if (app.getExistingLicenseNumber() != null && !app.getExistingLicenseNumber().isBlank()) {
+                            issuedDocNumber = app.getExistingLicenseNumber().trim().toUpperCase();
+                        } else {
+                            issuedDocNumber = documentNumberGenerator.generateLicenseNumber();
+                        }
+                        app.setIssuedLicenseNumber(issuedDocNumber);
+                    }
+                }
+
                 app.setStatus(newStatus);
                 app.setOfficerComment(dto.getOfficerComment());
                 licenseRepository.save(app);
-                refNo = app.getReferenceNumber();
-                userId = app.getUser().getId();
             }
             case PASSPORT -> {
                 PassportApplication app = passportRepository.findById(dto.getApplicationId())
@@ -228,55 +253,105 @@ public class VerificationService {
                 validateWorkflowTransition(app.getStatus(), newStatus,
                     paymentRepository.findFirstByApplicationIdAndApplicationTypeOrderByCreatedAtDesc(app.getId(), ApplicationType.PASSPORT)
                         .map(PaymentTransaction::getPaymentStatus).orElse(PaymentStatus.PENDING));
+
+                docTypeDisplayName = "Passport";
+                refNo = app.getReferenceNumber();
+                userId = app.getUser().getId();
+                citizenEmail = app.getUser().getEmail();
+                citizenName = app.getFullName();
+
+                if (newStatus == ApplicationStatus.SHIPPED) {
+                    issuedDocNumber = app.getIssuedPassportNumber();
+                    if (issuedDocNumber == null || issuedDocNumber.isBlank()) {
+                        if (app.getExistingPassportNumber() != null && !app.getExistingPassportNumber().isBlank()) {
+                            issuedDocNumber = app.getExistingPassportNumber().trim().toUpperCase();
+                        } else {
+                            issuedDocNumber = documentNumberGenerator.generatePassportNumber();
+                        }
+                        app.setIssuedPassportNumber(issuedDocNumber);
+                    }
+                }
+
                 app.setStatus(newStatus);
                 app.setOfficerComment(dto.getOfficerComment());
                 passportRepository.save(app);
-                refNo = app.getReferenceNumber();
-                userId = app.getUser().getId();
             }
             case NIC -> {
                 NicApplication app = nicRepository.findById(dto.getApplicationId())
                         .orElseThrow(() -> new IllegalArgumentException("NIC application not found."));
                 validateWorkflowTransition(app.getStatus(), newStatus, app.getPaymentStatus());
+
+                docTypeDisplayName = "National Identity Card (NIC)";
+                refNo = app.getReferenceNumber();
+                userId = app.getUser().getId();
+                citizenEmail = app.getUser().getEmail();
+                citizenName = app.getFullName();
+
+                if (newStatus == ApplicationStatus.SHIPPED) {
+                    issuedDocNumber = app.getIssuedNicNumber();
+                    if (issuedDocNumber == null || issuedDocNumber.isBlank()) {
+                        if (app.getExistingNicNumber() != null && !app.getExistingNicNumber().isBlank()) {
+                            issuedDocNumber = app.getExistingNicNumber().trim().toUpperCase();
+                        } else {
+                            issuedDocNumber = documentNumberGenerator.generateNicNumber(app.getDateOfBirth(), app.getGender());
+                        }
+                        app.setIssuedNicNumber(issuedDocNumber);
+                    }
+
+                    // Sync to user profile if user doesn't have an NIC registered yet
+                    User citizen = app.getUser();
+                    if (citizen != null && (citizen.getNicNumber() == null || citizen.getNicNumber().isBlank())) {
+                        citizen.setNicNumber(issuedDocNumber);
+                        userRepository.save(citizen);
+                    }
+                }
+
                 app.setStatus(newStatus);
                 app.setOfficerComment(dto.getOfficerComment());
                 nicRepository.save(app);
-                refNo = app.getReferenceNumber();
-                userId = app.getUser().getId();
             }
         }
 
         // Send citizen notification
         String statusSubject = switch (newStatus) {
             case APPROVED -> "Application Approved - Payment Required: " + refNo;
-            case SHIPPED -> "Payment Verified & Document Shipped: " + refNo;
+            case SHIPPED -> "Payment Verified & " + docTypeDisplayName + " Shipped (" + (issuedDocNumber != null ? issuedDocNumber : refNo) + ")";
             case REJECTED -> "Application Rejected: " + refNo;
             case PENDING_CORRECTION -> "Action Required / Correction Requested: " + refNo;
             default -> "Application Status Updated: " + refNo;
         };
 
         String messageBody = switch (newStatus) {
-            case APPROVED -> "Your " + dto.getApplicationType() + " application (" + refNo
+            case APPROVED -> "Your " + docTypeDisplayName + " application (" + refNo
                 + ") has been approved. Please pay by card from your application details page: /payment/checkout/"
                 + dto.getApplicationType() + "/" + dto.getApplicationId() + ".";
-            case SHIPPED -> "Your payment for " + refNo + " has been verified by the officer. Your "
-                + dto.getApplicationType() + " card has been dispatched and is on the way. "
-                + "Once you receive it, please mark it as Received from your dashboard.";
-            default -> "Your " + dto.getApplicationType() + " application (" + refNo + ") status has been updated to: "
+            case SHIPPED -> "Your payment for " + refNo + " has been verified by the officer. Your official "
+                + docTypeDisplayName + " (Number: " + issuedDocNumber + ") has been issued and dispatched. "
+                + "Please securely record this number for any future renewals or lost replacement applications. "
+                + "Once you receive the physical document, please mark it as Received from your dashboard.";
+            default -> "Your " + docTypeDisplayName + " application (" + refNo + ") status has been updated to: "
                 + newStatus + ".\n\nOfficer Comments: " + (dto.getOfficerComment() != null ? dto.getOfficerComment() : "None");
         };
 
         notificationService.sendNotification(userId, statusSubject, messageBody);
+
+        // Send official issuance email to citizen's email address
+        if (newStatus == ApplicationStatus.SHIPPED && issuedDocNumber != null && citizenEmail != null && !citizenEmail.isBlank()) {
+            emailService.sendDocumentIssuedEmail(citizenEmail, citizenName, docTypeDisplayName, issuedDocNumber, refNo);
+        }
 
         // Record Audit Log
         auditLogService.recordLog(officer.getEmail(),
                 "APPLICATION_" + newStatus.name(),
                 dto.getApplicationType().name(),
                 refNo,
-                "Officer " + officer.getFullName() + " set status to " + newStatus + ". Remarks: " + dto.getOfficerComment(),
+                "Officer " + officer.getFullName() + " set status to " + newStatus
+                + (issuedDocNumber != null ? " with official number: " + issuedDocNumber : "")
+                + ". Remarks: " + dto.getOfficerComment(),
                 "127.0.0.1");
 
-        log.info("Application [{}] status changed to {} by officer {}", refNo, newStatus, officer.getEmail());
+        log.info("Application [{}] status changed to {} by officer {} (Issued Number: {})",
+                refNo, newStatus, officer.getEmail(), issuedDocNumber);
     }
 
     private void validateWorkflowTransition(ApplicationStatus currentStatus,

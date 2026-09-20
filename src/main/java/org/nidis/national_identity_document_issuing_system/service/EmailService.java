@@ -84,5 +84,45 @@ public class EmailService {
             log.warn("SMTP email sending not completed ({}); 2FA OTP is accessible in application logs above.", ex.getMessage());
         }
     }
+
+    public void sendDocumentIssuedEmail(String toEmail, String fullName, String documentType, String documentNumber, String referenceNumber) {
+        log.info("=================================================================");
+        log.info("🪪 [NIDIS OFFICIAL DOCUMENT ISSUANCE & SHIPMENT NOTICE]");
+        log.info("Recipient: {} ({})", toEmail, fullName);
+        log.info("Document Type: {}", documentType);
+        log.info("Issued Document Number: >>> {} <<<", documentNumber);
+        log.info("Application Reference: {}", referenceNumber);
+        log.info("Delivery Status: SHIPPED via Postal / Courier Dispatch");
+        log.info("=================================================================");
+
+        try {
+            SimpleMailMessage message = new SimpleMailMessage();
+            message.setTo(toEmail);
+            message.setSubject("NIDIS - Official " + documentType + " Issued & Dispatched (" + documentNumber + ")");
+            message.setText("Dear " + (fullName != null ? fullName : "Citizen") + ",\n\n"
+                    + "We are pleased to inform you that your payment for application " + referenceNumber + " has been verified by the issuing officer.\n\n"
+                    + "Your official Sri Lankan " + documentType + " has been issued, printed, and dispatched for delivery.\n\n"
+                    + "=================================================================\n"
+                    + "OFFICIAL ISSUED DOCUMENT DETAILS:\n"
+                    + "  - Document Type:            " + documentType + "\n"
+                    + "  - Official Document Number:  " + documentNumber + "\n"
+                    + "  - Application Reference:    " + referenceNumber + "\n"
+                    + "  - Status:                   SHIPPED (In Transit)\n"
+                    + "=================================================================\n\n"
+                    + "IMPORTANT NOTICE FOR FUTURE REFERENCE & RENEWALS:\n"
+                    + "Please securely record and save your official document number: " + documentNumber + ".\n"
+                    + "If you ever need to RENEW your document or apply for a duplicate replacement if it is LOST in the future, "
+                    + "you can enter this same number (" + documentNumber + ") on the NIDIS portal to immediately look up and auto-fill your bio-data details.\n\n"
+                    + "Once you receive your physical document at your registered address, please log into your NIDIS citizen account "
+                    + "and confirm receipt by clicking 'Mark as Received'.\n\n"
+                    + "Thank you for using the National Identity Document Issuing System.\n\n"
+                    + "National Identity Document Issuing System (NIDIS)\n"
+                    + "Government of Sri Lanka");
+            mailSender.send(message);
+            log.info("Official document issuance notice email successfully sent via SMTP to {}", toEmail);
+        } catch (Exception ex) {
+            log.warn("SMTP email sending not completed ({}); Document details logged above.", ex.getMessage());
+        }
+    }
 }
 

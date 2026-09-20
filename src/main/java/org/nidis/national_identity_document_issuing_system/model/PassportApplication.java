@@ -49,6 +49,9 @@ public class PassportApplication {
     @Column(length = 20)
     private String existingPassportNumber;
 
+    @Column(name = "issued_passport_number", length = 20)
+    private String issuedPassportNumber;
+
     @Column(nullable = false, length = 100)
     private String fullName;
 

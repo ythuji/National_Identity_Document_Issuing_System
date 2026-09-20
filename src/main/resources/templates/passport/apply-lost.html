@@ -19,16 +19,9 @@
                 </a>
             </div>
 
-            <!-- Error alert -->
-            <div th:if="${errorMessage}" class="alert alert-danger alert-dismissible fade show" role="alert">
-                <i class="bi bi-exclamation-triangle-fill me-2"></i>
-                <span th:text="${errorMessage}"></span>
-                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-            </div>
-
             <div class="card border-0 shadow-sm">
                 <div class="card-body p-4">
-                    <form th:action="@{/passport/apply}" th:object="${passportDto}" method="post" enctype="multipart/form-data">
+                    <form th:action="@{/passport/apply}" th:object="${passportDto}" method="post" enctype="multipart/form-data" class="needs-validation" novalidate>
                         <input type="hidden" th:field="*{id}">
                         <input type="hidden" th:field="*{category}">
 
@@ -39,11 +32,15 @@
                                 <div class="col-md-6">
                                     <label for="policeReportRef" class="form-label small fw-semibold">Police Entry / CIB Number <span class="text-danger">*</span></label>
                                     <input type="text" class="form-control" id="policeReportRef" th:field="*{policeReportRef}"
+                                           th:classappend="${#fields.hasErrors('policeReportRef')} ? 'is-invalid' : ''"
                                            placeholder="e.g. CIB/2026/09/8821" required>
+                                    <div class="invalid-feedback" th:if="${#fields.hasErrors('policeReportRef')}" th:errors="*{policeReportRef}"></div>
+                                    <div class="invalid-feedback" th:unless="${#fields.hasErrors('policeReportRef')}">Police entry reference is mandatory for lost passport.</div>
                                 </div>
                                 <div class="col-md-6">
                                     <label class="form-label small fw-semibold">Upload Police Certificate Extract <span class="text-danger">*</span></label>
                                     <input type="file" class="form-control" name="policeReportFile" accept="image/*,.pdf" required>
+                                    <div class="invalid-feedback">Please upload certified police report extract.</div>
                                 </div>
                             </div>
                         </div>
@@ -54,40 +51,64 @@
                         </h5>
 
                         <div class="mb-3">
-                            <label for="fullName" class="form-label">Full Name (English Capital Letters)</label>
-                            <input type="text" class="form-control text-uppercase" id="fullName" th:field="*{fullName}" required>
+                            <label for="fullName" class="form-label">Full Name (English Capital Letters) <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control text-uppercase" id="fullName" th:field="*{fullName}"
+                                   th:classappend="${#fields.hasErrors('fullName')} ? 'is-invalid' : ''" required>
+                            <div class="invalid-feedback" th:if="${#fields.hasErrors('fullName')}" th:errors="*{fullName}"></div>
+                            <div class="invalid-feedback" th:unless="${#fields.hasErrors('fullName')}">Full name is required.</div>
                         </div>
 
                         <div class="row">
                             <div class="col-md-6 mb-3">
                                 <label for="existingPassportNumber" class="form-label">Lost Passport Number (if remembered)</label>
-                                <input type="text" class="form-control text-uppercase" id="existingPassportNumber" th:field="*{existingPassportNumber}" placeholder="e.g. N9876543">
+                                <div class="input-group">
+                                    <input type="text" class="form-control text-uppercase font-monospace" id="existingPassportNumber" th:field="*{existingPassportNumber}"
+                                           th:classappend="${#fields.hasErrors('existingPassportNumber')} ? 'is-invalid' : ''"
+                                           placeholder="e.g. N9876543">
+                                    <button type="button" id="btnLookup" class="btn btn-outline-danger">
+                                        <i class="bi bi-magic me-1"></i>Lookup & Fill
+                                    </button>
+                                </div>
+                                <div class="invalid-feedback d-block" th:if="${#fields.hasErrors('existingPassportNumber')}" th:errors="*{existingPassportNumber}"></div>
+                                <div class="form-text" id="lookupNotice">Enter your passport number to auto-fill saved bio-data.</div>
                             </div>
                             <div class="col-md-6 mb-3">
-                                <label for="dateOfBirth" class="form-label">Date of Birth</label>
-                                <input type="date" class="form-control" id="dateOfBirth" th:field="*{dateOfBirth}" required>
+                                <label for="dateOfBirth" class="form-label">Date of Birth <span class="text-danger">*</span></label>
+                                <input type="date" class="form-control dob-input" id="dateOfBirth" th:field="*{dateOfBirth}"
+                                       th:classappend="${#fields.hasErrors('dateOfBirth')} ? 'is-invalid' : ''" required>
+                                <div class="invalid-feedback" th:if="${#fields.hasErrors('dateOfBirth')}" th:errors="*{dateOfBirth}"></div>
+                                <div class="invalid-feedback" th:unless="${#fields.hasErrors('dateOfBirth')}">Date of birth is required.</div>
                             </div>
                         </div>
 
                         <div class="row">
                             <div class="col-md-6 mb-3">
-                                <label for="placeOfBirth" class="form-label">Place of Birth</label>
-                                <input type="text" class="form-control" id="placeOfBirth" th:field="*{placeOfBirth}" required>
+                                <label for="placeOfBirth" class="form-label">Place of Birth <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" id="placeOfBirth" th:field="*{placeOfBirth}"
+                                       th:classappend="${#fields.hasErrors('placeOfBirth')} ? 'is-invalid' : ''" required>
+                                <div class="invalid-feedback" th:if="${#fields.hasErrors('placeOfBirth')}" th:errors="*{placeOfBirth}"></div>
+                                <div class="invalid-feedback" th:unless="${#fields.hasErrors('placeOfBirth')}">Place of birth is required.</div>
                             </div>
                             <div class="col-md-6 mb-3">
-                                <label for="gender" class="form-label">Gender</label>
-                                <select class="form-select" id="gender" th:field="*{gender}" required>
+                                <label for="gender" class="form-label">Gender <span class="text-danger">*</span></label>
+                                <select class="form-select" id="gender" th:field="*{gender}"
+                                        th:classappend="${#fields.hasErrors('gender')} ? 'is-invalid' : ''" required>
                                     <option value="Male">Male</option>
                                     <option value="Female">Female</option>
                                     <option value="Other">Other</option>
                                 </select>
+                                <div class="invalid-feedback" th:if="${#fields.hasErrors('gender')}" th:errors="*{gender}"></div>
+                                <div class="invalid-feedback" th:unless="${#fields.hasErrors('gender')}">Please select gender.</div>
                             </div>
                         </div>
 
                         <div class="row">
                             <div class="col-md-6 mb-3">
-                                <label for="phone" class="form-label">Phone Number</label>
-                                <input type="tel" class="form-control" id="phone" th:field="*{phone}" required>
+                                <label for="phone" class="form-label">Phone Number <span class="text-danger">*</span></label>
+                                <input type="tel" class="form-control phone-input" id="phone" th:field="*{phone}" pattern="[0-9]{10}" maxlength="10" inputmode="numeric"
+                                       th:classappend="${#fields.hasErrors('phone')} ? 'is-invalid' : ''" required>
+                                <div class="invalid-feedback" th:if="${#fields.hasErrors('phone')}" th:errors="*{phone}"></div>
+                                <div class="invalid-feedback" th:unless="${#fields.hasErrors('phone')}">Valid 10-digit mobile number is required (e.g. 0771234567).</div>
                             </div>
                             <div class="col-md-6 mb-3">
                                 <label for="profession" class="form-label">Profession</label>
@@ -96,8 +117,11 @@
                         </div>
 
                         <div class="mb-3">
-                            <label for="address" class="form-label">Permanent Address</label>
-                            <textarea class="form-control" id="address" th:field="*{address}" rows="2" required></textarea>
+                            <label for="address" class="form-label">Permanent Address <span class="text-danger">*</span></label>
+                            <textarea class="form-control" id="address" th:field="*{address}" rows="2"
+                                      th:classappend="${#fields.hasErrors('address')} ? 'is-invalid' : ''" required></textarea>
+                            <div class="invalid-feedback" th:if="${#fields.hasErrors('address')}" th:errors="*{address}"></div>
+                            <div class="invalid-feedback" th:unless="${#fields.hasErrors('address')}">Permanent address is required.</div>
                         </div>
 
                         <!-- Attachments -->
@@ -109,10 +133,12 @@
                             <div class="col-md-6">
                                 <label class="form-label fw-semibold">Recent Color Photograph <span class="text-danger">*</span></label>
                                 <input type="file" class="form-control" name="photoFile" accept="image/*" required>
+                                <div class="invalid-feedback">Please attach a recent photograph.</div>
                             </div>
                             <div class="col-md-6">
                                 <label class="form-label fw-semibold">National Identity Card Copy <span class="text-danger">*</span></label>
                                 <input type="file" class="form-control" name="nicCopyFile" accept="image/*,.pdf" required>
+                                <div class="invalid-feedback">Please attach NIC front and back copy.</div>
                             </div>
                         </div>
 
@@ -132,6 +158,39 @@
         </div>
     </div>
 </main>
+
+<script>
+document.getElementById('btnLookup').addEventListener('click', function() {
+    const passInput = document.getElementById('existingPassportNumber');
+    const passNo = passInput.value.trim();
+    const notice = document.getElementById('lookupNotice');
+    if (!passNo) {
+        passInput.classList.add('is-invalid');
+        notice.innerHTML = '<span class="text-danger fw-semibold"><i class="bi bi-exclamation-circle me-1"></i>Please enter a passport number first.</span>';
+        passInput.focus();
+        return;
+    }
+    passInput.classList.remove('is-invalid');
+    fetch('/passport/prefill?passportNumber=' + encodeURIComponent(passNo))
+        .then(response => {
+            if (!response.ok) throw new Error('No prior record found for this passport number.');
+            return response.json();
+        })
+        .then(data => {
+            if (data.fullName) document.getElementById('fullName').value = data.fullName;
+            if (data.dateOfBirth) document.getElementById('dateOfBirth').value = data.dateOfBirth;
+            if (data.placeOfBirth) document.getElementById('placeOfBirth').value = data.placeOfBirth;
+            if (data.nationality) document.getElementById('nationality').value = data.nationality;
+            if (data.profession) document.getElementById('profession').value = data.profession;
+            if (data.phone) document.getElementById('phone').value = data.phone;
+            if (data.address) document.getElementById('address').value = data.address;
+            notice.innerHTML = '<span class="text-success fw-bold"><i class="bi bi-check-circle me-1"></i>Details auto-filled from database records!</span>';
+        })
+        .catch(err => {
+            notice.innerHTML = '<span class="text-warning"><i class="bi bi-info-circle me-1"></i>' + err.message + ' Please fill in details manually.</span>';
+        });
+});
+</script>
 
 <footer th:replace="~{fragments/footer :: footer}"></footer>
 <th:block th:replace="~{fragments/footer :: scripts}"></th:block>

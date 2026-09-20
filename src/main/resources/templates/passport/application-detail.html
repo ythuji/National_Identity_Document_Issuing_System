@@ -90,8 +90,25 @@
                 </div>
             </div>
 
+            <!-- Official Issued Document Number Banner -->
+            <div th:if="${app.issuedPassportNumber}" class="card border-success shadow-sm mb-4 bg-success bg-opacity-10">
+                <div class="card-body p-4 d-flex justify-content-between align-items-center flex-wrap">
+                    <div>
+                        <span class="badge bg-success mb-2 px-3 py-1 text-uppercase"><i class="bi bi-patch-check-fill me-1"></i>Official Issued Passport Number</span>
+                        <h4 class="fw-bold text-dark font-monospace mb-1" th:text="${app.issuedPassportNumber}">N1234567</h4>
+                        <p class="mb-0 text-muted small">
+                            <i class="bi bi-shield-check text-success me-1"></i>This is your official Department of Immigration & Emigration (DIE) Passport Number. 
+                            Save this number for renewals or lost passport replacement applications.
+                        </p>
+                    </div>
+                    <div class="mt-3 mt-md-0 text-md-end">
+                        <span class="badge bg-success fs-6 px-3 py-2"><i class="bi bi-check2-circle me-1"></i>ISSUED</span>
+                    </div>
+                </div>
+            </div>
+
             <div th:if="${#strings.toString(app.status) == 'SHIPPED'}" class="alert alert-primary d-flex justify-content-between align-items-center mb-4 shadow-sm" role="alert">
-                <div><i class="bi bi-box-seam fs-5 me-2"></i><strong>Your passport has been shipped.</strong> Confirm after delivery.</div>
+                <div><i class="bi bi-box-seam fs-5 me-2"></i><strong>Your Sri Lankan Passport has been shipped via registered courier/postal service.</strong> Confirm receipt once delivered to your address.</div>
                 <form th:action="@{/verification/received/PASSPORT/{id}(id=${app.id})}" method="post">
                     <button type="submit" class="btn btn-primary fw-semibold"><i class="bi bi-check2-circle me-1"></i>Mark as Received</button>
                 </form>
@@ -222,6 +239,10 @@
                                 <tr>
                                     <th class="text-muted ps-0">Dual Citizen:</th>
                                     <td th:text="${app.dualCitizenship ? 'Yes' : 'No'}"></td>
+                                </tr>
+                                <tr th:if="${app.issuedPassportNumber}">
+                                    <th class="text-muted ps-0">Official Issued Passport No:</th>
+                                    <td class="fw-bold text-success font-monospace" th:text="${app.issuedPassportNumber}"></td>
                                 </tr>
                                 <tr th:if="${app.existingPassportNumber}">
                                     <th class="text-muted ps-0">Existing Passport:</th>

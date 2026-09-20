@@ -99,7 +99,14 @@ public class NicController {
             return "redirect:/nic/view/" + application.getId();
         } catch (Exception ex) {
             log.error("Failed to submit NIC application: ", ex);
-            model.addAttribute("errorMessage", ex.getMessage());
+            String msg = ex.getMessage() != null ? ex.getMessage() : "Failed to submit NIC application.";
+            if ((dto.getCategory() == ApplicationCategory.RENEWAL || dto.getCategory() == ApplicationCategory.LOST) && msg.toLowerCase().contains("nic")) {
+                bindingResult.rejectValue("existingNicNumber", "error.nicDto", msg);
+            } else if (dto.getCategory() == ApplicationCategory.LOST && msg.toLowerCase().contains("police")) {
+                bindingResult.rejectValue("policeReportRef", "error.nicDto", msg);
+            } else {
+                bindingResult.rejectValue("fullName", "error.nicDto", msg);
+            }
             model.addAttribute("category", dto.getCategory());
             if (dto.getCategory() == ApplicationCategory.RENEWAL) return "nic/apply-renewal";
             if (dto.getCategory() == ApplicationCategory.LOST) return "nic/apply-lost";

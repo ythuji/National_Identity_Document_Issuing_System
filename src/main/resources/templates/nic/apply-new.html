@@ -19,16 +19,9 @@
                 </a>
             </div>
 
-            <!-- Error alert -->
-            <div th:if="${errorMessage}" class="alert alert-danger alert-dismissible fade show" role="alert">
-                <i class="bi bi-exclamation-triangle-fill me-2"></i>
-                <span th:text="${errorMessage}"></span>
-                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-            </div>
-
             <div class="card border-0 shadow-sm">
                 <div class="card-body p-4">
-                    <form th:action="@{/nic/apply}" th:object="${nicDto}" method="post" enctype="multipart/form-data">
+                    <form th:action="@{/nic/apply}" th:object="${nicDto}" method="post" enctype="multipart/form-data" class="needs-validation" novalidate>
                         <input type="hidden" th:field="*{id}">
                         <input type="hidden" th:field="*{category}">
 
@@ -41,34 +34,42 @@
                             <label for="fullName" class="form-label">Full Name (as appearing in Birth Certificate) <span class="text-danger">*</span></label>
                             <input type="text" class="form-control text-uppercase" id="fullName" th:field="*{fullName}"
                                    th:classappend="${#fields.hasErrors('fullName')} ? 'is-invalid' : ''" required>
-                            <div class="invalid-feedback" th:errors="*{fullName}"></div>
+                            <div class="invalid-feedback" th:if="${#fields.hasErrors('fullName')}" th:errors="*{fullName}"></div>
+                            <div class="invalid-feedback" th:unless="${#fields.hasErrors('fullName')}">Full name is required (as in Birth Certificate).</div>
                         </div>
 
                         <div class="row">
                             <div class="col-md-4 mb-3">
                                 <label for="dateOfBirth" class="form-label">Date of Birth <span class="text-danger">*</span></label>
-                                <input type="date" class="form-control" id="dateOfBirth" th:field="*{dateOfBirth}"
+                                <input type="date" class="form-control dob-input" data-adult-required="true" id="dateOfBirth" th:field="*{dateOfBirth}"
                                        th:classappend="${#fields.hasErrors('dateOfBirth')} ? 'is-invalid' : ''" required>
-                                <div class="invalid-feedback" th:errors="*{dateOfBirth}"></div>
+                                <div class="invalid-feedback" th:if="${#fields.hasErrors('dateOfBirth')}" th:errors="*{dateOfBirth}"></div>
+                                <div class="invalid-feedback" th:unless="${#fields.hasErrors('dateOfBirth')}">Applicant must be over 18 years old.</div>
                             </div>
                             <div class="col-md-4 mb-3">
                                 <label for="gender" class="form-label">Gender <span class="text-danger">*</span></label>
-                                <select class="form-select" id="gender" th:field="*{gender}" required>
+                                <select class="form-select" id="gender" th:field="*{gender}"
+                                        th:classappend="${#fields.hasErrors('gender')} ? 'is-invalid' : ''" required>
                                     <option value="">-- Select Gender --</option>
                                     <option value="Male">Male</option>
                                     <option value="Female">Female</option>
                                     <option value="Other">Other</option>
                                 </select>
+                                <div class="invalid-feedback" th:if="${#fields.hasErrors('gender')}" th:errors="*{gender}"></div>
+                                <div class="invalid-feedback" th:unless="${#fields.hasErrors('gender')}">Please select gender.</div>
                             </div>
                             <div class="col-md-4 mb-3">
                                 <label for="civilStatus" class="form-label">Civil Status <span class="text-danger">*</span></label>
-                                <select class="form-select" id="civilStatus" th:field="*{civilStatus}" required>
+                                <select class="form-select" id="civilStatus" th:field="*{civilStatus}"
+                                        th:classappend="${#fields.hasErrors('civilStatus')} ? 'is-invalid' : ''" required>
                                     <option value="">-- Select Status --</option>
                                     <option value="Single">Single</option>
                                     <option value="Married">Married</option>
                                     <option value="Widowed">Widowed</option>
                                     <option value="Divorced">Divorced</option>
                                 </select>
+                                <div class="invalid-feedback" th:if="${#fields.hasErrors('civilStatus')}" th:errors="*{civilStatus}"></div>
+                                <div class="invalid-feedback" th:unless="${#fields.hasErrors('civilStatus')}">Please select civil status.</div>
                             </div>
                         </div>
 
@@ -79,13 +80,19 @@
                             </div>
                             <div class="col-md-6 mb-3">
                                 <label for="phone" class="form-label">Contact Mobile Number <span class="text-danger">*</span></label>
-                                <input type="tel" class="form-control" id="phone" th:field="*{phone}" required>
+                                <input type="tel" class="form-control phone-input" id="phone" th:field="*{phone}" pattern="[0-9]{10}" maxlength="10" inputmode="numeric"
+                                       th:classappend="${#fields.hasErrors('phone')} ? 'is-invalid' : ''" required>
+                                <div class="invalid-feedback" th:if="${#fields.hasErrors('phone')}" th:errors="*{phone}"></div>
+                                <div class="invalid-feedback" th:unless="${#fields.hasErrors('phone')}">Valid 10-digit phone number is required (e.g. 0771234567).</div>
                             </div>
                         </div>
 
                         <div class="mb-3">
                             <label for="permanentAddress" class="form-label">Permanent Residential Address <span class="text-danger">*</span></label>
-                            <textarea class="form-control" id="permanentAddress" th:field="*{permanentAddress}" rows="2" required></textarea>
+                            <textarea class="form-control" id="permanentAddress" th:field="*{permanentAddress}" rows="2"
+                                      th:classappend="${#fields.hasErrors('permanentAddress')} ? 'is-invalid' : ''" required></textarea>
+                            <div class="invalid-feedback" th:if="${#fields.hasErrors('permanentAddress')}" th:errors="*{permanentAddress}"></div>
+                            <div class="invalid-feedback" th:unless="${#fields.hasErrors('permanentAddress')}">Permanent address is required.</div>
                         </div>
 
                         <!-- Section 2: Administrative Division -->
@@ -96,11 +103,17 @@
                         <div class="row">
                             <div class="col-md-6 mb-3">
                                 <label for="gramaNiladhariDivision" class="form-label">Grama Niladhari (GN) Division & Number <span class="text-danger">*</span></label>
-                                <input type="text" class="form-control" id="gramaNiladhariDivision" th:field="*{gramaNiladhariDivision}" placeholder="e.g. 524A Colombo Central" required>
+                                <input type="text" class="form-control" id="gramaNiladhariDivision" th:field="*{gramaNiladhariDivision}" placeholder="e.g. 524A Colombo Central"
+                                       th:classappend="${#fields.hasErrors('gramaNiladhariDivision')} ? 'is-invalid' : ''" required>
+                                <div class="invalid-feedback" th:if="${#fields.hasErrors('gramaNiladhariDivision')}" th:errors="*{gramaNiladhariDivision}"></div>
+                                <div class="invalid-feedback" th:unless="${#fields.hasErrors('gramaNiladhariDivision')}">Grama Niladhari division is required.</div>
                             </div>
                             <div class="col-md-6 mb-3">
                                 <label for="divisionalSecretariat" class="form-label">Divisional Secretariat (DS) <span class="text-danger">*</span></label>
-                                <input type="text" class="form-control" id="divisionalSecretariat" th:field="*{divisionalSecretariat}" placeholder="e.g. Thimbirigasyaya" required>
+                                <input type="text" class="form-control" id="divisionalSecretariat" th:field="*{divisionalSecretariat}" placeholder="e.g. Thimbirigasyaya"
+                                       th:classappend="${#fields.hasErrors('divisionalSecretariat')} ? 'is-invalid' : ''" required>
+                                <div class="invalid-feedback" th:if="${#fields.hasErrors('divisionalSecretariat')}" th:errors="*{divisionalSecretariat}"></div>
+                                <div class="invalid-feedback" th:unless="${#fields.hasErrors('divisionalSecretariat')}">Divisional secretariat is required.</div>
                             </div>
                         </div>
 
@@ -113,16 +126,19 @@
                             <div class="col-md-4">
                                 <label class="form-label fw-semibold">ICAO Color Photo <span class="text-danger">*</span></label>
                                 <input type="file" class="form-control" name="photoFile" accept="image/*" required>
+                                <div class="invalid-feedback">Please attach a valid studio photograph.</div>
                                 <div class="form-text">Studio photo (35mm x 45mm, blue/light background)</div>
                             </div>
                             <div class="col-md-4">
                                 <label class="form-label fw-semibold">Birth Certificate Scan <span class="text-danger">*</span></label>
                                 <input type="file" class="form-control" name="birthCertFile" accept="image/*,.pdf" required>
+                                <div class="invalid-feedback">Please attach your birth certificate.</div>
                                 <div class="form-text">Clear certified copy / original scan</div>
                             </div>
                             <div class="col-md-4">
                                 <label class="form-label fw-semibold">Grama Niladhari Certificate <span class="text-danger">*</span></label>
                                 <input type="file" class="form-control" name="addressProofFile" accept="image/*,.pdf" required>
+                                <div class="invalid-feedback">Please attach Grama Niladhari certificate.</div>
                                 <div class="form-text">Residence proof certified by GN officer</div>
                             </div>
                         </div>

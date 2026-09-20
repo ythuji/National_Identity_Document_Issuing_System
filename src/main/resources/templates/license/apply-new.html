@@ -19,16 +19,9 @@
                 </a>
             </div>
 
-            <!-- Error alert -->
-            <div th:if="${errorMessage}" class="alert alert-danger alert-dismissible fade show" role="alert">
-                <i class="bi bi-exclamation-triangle-fill me-2"></i>
-                <span th:text="${errorMessage}"></span>
-                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-            </div>
-
             <div class="card border-0 shadow-sm">
                 <div class="card-body p-4">
-                    <form th:action="@{/license/apply}" th:object="${licenseDto}" method="post" enctype="multipart/form-data">
+                    <form th:action="@{/license/apply}" th:object="${licenseDto}" method="post" enctype="multipart/form-data" class="needs-validation" novalidate>
                         <input type="hidden" th:field="*{id}">
                         <input type="hidden" th:field="*{category}">
 
@@ -41,21 +34,24 @@
                             <label for="fullName" class="form-label">Full Name (as in National Identity Card)</label>
                             <input type="text" class="form-control" id="fullName" th:field="*{fullName}"
                                    th:classappend="${#fields.hasErrors('fullName')} ? 'is-invalid' : ''" required>
-                            <div class="invalid-feedback" th:errors="*{fullName}"></div>
+                            <div class="invalid-feedback" th:if="${#fields.hasErrors('fullName')}" th:errors="*{fullName}"></div>
+                            <div class="invalid-feedback" th:unless="${#fields.hasErrors('fullName')}">Full name is required.</div>
                         </div>
 
                         <div class="row">
                             <div class="col-md-6 mb-3">
                                 <label for="dateOfBirth" class="form-label">Date of Birth</label>
-                                <input type="date" class="form-control" id="dateOfBirth" th:field="*{dateOfBirth}"
+                                <input type="date" class="form-control dob-input" data-adult-required="true" id="dateOfBirth" th:field="*{dateOfBirth}"
                                        th:classappend="${#fields.hasErrors('dateOfBirth')} ? 'is-invalid' : ''" required>
-                                <div class="invalid-feedback" th:errors="*{dateOfBirth}"></div>
+                                <div class="invalid-feedback" th:if="${#fields.hasErrors('dateOfBirth')}" th:errors="*{dateOfBirth}"></div>
+                                <div class="invalid-feedback" th:unless="${#fields.hasErrors('dateOfBirth')}">Applicant must be over 18 years old.</div>
                             </div>
                             <div class="col-md-6 mb-3">
                                 <label for="phone" class="form-label">Mobile Contact</label>
-                                <input type="tel" class="form-control" id="phone" th:field="*{phone}"
+                                <input type="tel" class="form-control phone-input" id="phone" th:field="*{phone}" pattern="[0-9]{10}" maxlength="10" inputmode="numeric"
                                        th:classappend="${#fields.hasErrors('phone')} ? 'is-invalid' : ''" required>
-                                <div class="invalid-feedback" th:errors="*{phone}"></div>
+                                <div class="invalid-feedback" th:if="${#fields.hasErrors('phone')}" th:errors="*{phone}"></div>
+                                <div class="invalid-feedback" th:unless="${#fields.hasErrors('phone')}">Valid 10-digit mobile number is required (e.g. 0771234567).</div>
                             </div>
                         </div>
 
@@ -63,7 +59,8 @@
                             <label for="address" class="form-label">Permanent Residential Address</label>
                             <textarea class="form-control" id="address" th:field="*{address}" rows="2"
                                       th:classappend="${#fields.hasErrors('address')} ? 'is-invalid' : ''" required></textarea>
-                            <div class="invalid-feedback" th:errors="*{address}"></div>
+                            <div class="invalid-feedback" th:if="${#fields.hasErrors('address')}" th:errors="*{address}"></div>
+                            <div class="invalid-feedback" th:unless="${#fields.hasErrors('address')}">Permanent residential address is required.</div>
                         </div>
 
                         <!-- Section 2: Vehicle Class -->
@@ -73,7 +70,8 @@
 
                         <div class="mb-3">
                             <label for="vehicleClass" class="form-label">Vehicle Classes Applied</label>
-                            <select class="form-select" id="vehicleClass" th:field="*{vehicleClass}" required>
+                            <select class="form-select" id="vehicleClass" th:field="*{vehicleClass}"
+                                    th:classappend="${#fields.hasErrors('vehicleClass')} ? 'is-invalid' : ''" required>
                                 <option value="">-- Select Class --</option>
                                 <option value="A (Motorcycle up to 100cc)">A - Motorcycle up to 100cc</option>
                                 <option value="A1 (Light Motorcycle up to 125cc)">A1 - Light Motorcycle up to 125cc</option>
@@ -82,7 +80,8 @@
                                 <option value="C (Heavy Motor Coach)">C - Heavy Motor Coach / Bus</option>
                                 <option value="CE (Heavy Commercial Trailer)">CE - Heavy Commercial Trailer</option>
                             </select>
-                            <div class="invalid-feedback" th:errors="*{vehicleClass}"></div>
+                            <div class="invalid-feedback" th:if="${#fields.hasErrors('vehicleClass')}" th:errors="*{vehicleClass}"></div>
+                            <div class="invalid-feedback" th:unless="${#fields.hasErrors('vehicleClass')}">Please select a vehicle class.</div>
                         </div>
 
                         <div class="form-check mb-3">
@@ -101,11 +100,13 @@
                             <div class="col-md-4">
                                 <label class="form-label fw-semibold">Passport-size Photograph <span class="text-danger">*</span></label>
                                 <input type="file" class="form-control" name="photoFile" accept="image/*" required>
+                                <div class="invalid-feedback">Please attach a passport-size photograph.</div>
                                 <div class="form-text">JPG or PNG (max 10MB)</div>
                             </div>
                             <div class="col-md-4">
                                 <label class="form-label fw-semibold">National Identity Card Copy <span class="text-danger">*</span></label>
                                 <input type="file" class="form-control" name="idProofFile" accept="image/*,.pdf" required>
+                                <div class="invalid-feedback">Please attach NIC front and back copy.</div>
                                 <div class="form-text">PDF or Image of NIC Front & Back</div>
                             </div>
                             <div class="col-md-4">

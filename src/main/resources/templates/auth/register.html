@@ -14,65 +14,64 @@
                     <p class="small mb-0 opacity-75">Register to access national identity document services</p>
                 </div>
                 <div class="card-body p-4">
-
-                    <!-- Global validation error -->
-                    <div th:if="${#fields.hasErrors('${registrationDto}')}" class="alert alert-danger" role="alert">
-                        <i class="bi bi-exclamation-triangle-fill me-2"></i>
-                        Please correct the errors indicated below.
-                    </div>
-
-                    <form th:action="@{/register}" th:object="${registrationDto}" method="post">
+                    <form th:action="@{/register}" th:object="${registrationDto}" method="post" class="needs-validation" novalidate>
 
                         <div class="mb-3">
-                            <label for="fullName" class="form-label">Full Name</label>
+                            <label for="fullName" class="form-label">Full Name <span class="text-danger">*</span></label>
                             <input type="text" class="form-control" id="fullName" th:field="*{fullName}"
                                    th:classappend="${#fields.hasErrors('fullName')} ? 'is-invalid' : ''"
-                                   placeholder="e.g. John Doe Perera">
-                            <div class="invalid-feedback" th:errors="*{fullName}"></div>
+                                   placeholder="e.g. John Doe Perera" required>
+                            <div class="invalid-feedback" th:if="${#fields.hasErrors('fullName')}" th:errors="*{fullName}"></div>
+                            <div class="invalid-feedback" th:unless="${#fields.hasErrors('fullName')}">Full name is required.</div>
                         </div>
 
                         <div class="row">
                             <div class="col-md-6 mb-3">
-                                <label for="email" class="form-label">Email Address</label>
+                                <label for="email" class="form-label">Email Address <span class="text-danger">*</span></label>
                                 <input type="email" class="form-control" id="email" th:field="*{email}"
                                        th:classappend="${#fields.hasErrors('email')} ? 'is-invalid' : ''"
-                                       placeholder="name@domain.com">
-                                <div class="invalid-feedback" th:errors="*{email}"></div>
+                                       placeholder="name@domain.com" required>
+                                <div class="invalid-feedback" th:if="${#fields.hasErrors('email')}" th:errors="*{email}"></div>
+                                <div class="invalid-feedback" th:unless="${#fields.hasErrors('email')}">Valid email address is required.</div>
                                 <div class="form-text">OTP verification code will be sent to this email.</div>
                             </div>
 
                             <div class="col-md-6 mb-3">
-                                <label for="phone" class="form-label">Mobile Phone</label>
-                                <input type="tel" class="form-control" id="phone" th:field="*{phone}"
+                                <label for="phone" class="form-label">Mobile Phone <span class="text-danger">*</span></label>
+                                <input type="tel" class="form-control phone-input" id="phone" th:field="*{phone}" pattern="[0-9]{10}" maxlength="10" inputmode="numeric"
                                        th:classappend="${#fields.hasErrors('phone')} ? 'is-invalid' : ''"
-                                       placeholder="e.g. 0771234567">
-                                <div class="invalid-feedback" th:errors="*{phone}"></div>
+                                       placeholder="e.g. 0771234567" required>
+                                <div class="invalid-feedback" th:if="${#fields.hasErrors('phone')}" th:errors="*{phone}"></div>
+                                <div class="invalid-feedback" th:unless="${#fields.hasErrors('phone')}">Valid 10-digit mobile number is required.</div>
                             </div>
                         </div>
 
                         <div class="mb-3">
-                            <label for="nicNumber" class="form-label">National Identity Card (NIC) / Passport No</label>
+                            <label for="nicNumber" class="form-label">National Identity Card (NIC) / Passport No <span class="text-danger">*</span></label>
                             <input type="text" class="form-control" id="nicNumber" th:field="*{nicNumber}"
                                    th:classappend="${#fields.hasErrors('nicNumber')} ? 'is-invalid' : ''"
-                                   placeholder="e.g. 200012345678 or 991234567V">
-                            <div class="invalid-feedback" th:errors="*{nicNumber}"></div>
+                                   placeholder="e.g. 200012345678 or 991234567V" required>
+                            <div class="invalid-feedback" th:if="${#fields.hasErrors('nicNumber')}" th:errors="*{nicNumber}"></div>
+                            <div class="invalid-feedback" th:unless="${#fields.hasErrors('nicNumber')}">Valid NIC or Passport number is required.</div>
                         </div>
 
                         <div class="row">
                             <div class="col-md-6 mb-3">
-                                <label for="password" class="form-label">Password</label>
-                                <input type="password" class="form-control" id="password" th:field="*{password}"
+                                <label for="password" class="form-label">Password <span class="text-danger">*</span></label>
+                                <input type="password" class="form-control" id="password" th:field="*{password}" minlength="8"
                                        th:classappend="${#fields.hasErrors('password')} ? 'is-invalid' : ''"
-                                       placeholder="Min 8 characters">
-                                <div class="invalid-feedback" th:errors="*{password}"></div>
+                                       placeholder="Min 8 characters" required>
+                                <div class="invalid-feedback" th:if="${#fields.hasErrors('password')}" th:errors="*{password}"></div>
+                                <div class="invalid-feedback" th:unless="${#fields.hasErrors('password')}">Password is required (min 8 characters).</div>
                             </div>
 
                             <div class="col-md-6 mb-3">
-                                <label for="confirmPassword" class="form-label">Confirm Password</label>
-                                <input type="password" class="form-control" id="confirmPassword" th:field="*{confirmPassword}"
+                                <label for="confirmPassword" class="form-label">Confirm Password <span class="text-danger">*</span></label>
+                                <input type="password" class="form-control" id="confirmPassword" th:field="*{confirmPassword}" minlength="8"
                                        th:classappend="${#fields.hasErrors('confirmPassword')} ? 'is-invalid' : ''"
-                                       placeholder="Re-type password">
-                                <div class="invalid-feedback" th:errors="*{confirmPassword}"></div>
+                                       placeholder="Re-type password" required>
+                                <div class="invalid-feedback" th:if="${#fields.hasErrors('confirmPassword')}" th:errors="*{confirmPassword}"></div>
+                                <div class="invalid-feedback" th:unless="${#fields.hasErrors('confirmPassword')}">Please re-type to confirm your password.</div>
                             </div>
                         </div>
 

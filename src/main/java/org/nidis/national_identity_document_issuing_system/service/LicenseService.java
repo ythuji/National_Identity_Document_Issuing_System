@@ -135,9 +135,12 @@ public class LicenseService {
 
     public Optional<LicenseApplication> prefillForRenewal(String existingLicenseNumber) {
         if (existingLicenseNumber == null || existingLicenseNumber.isBlank()) return Optional.empty();
-        Optional<LicenseApplication> byLic = licenseRepository.findTopByExistingLicenseNumberOrderByCreatedAtDesc(existingLicenseNumber.trim());
+        String trimmed = existingLicenseNumber.trim();
+        Optional<LicenseApplication> byIssued = licenseRepository.findTopByIssuedLicenseNumberOrderByCreatedAtDesc(trimmed);
+        if (byIssued.isPresent()) return byIssued;
+        Optional<LicenseApplication> byLic = licenseRepository.findTopByExistingLicenseNumberOrderByCreatedAtDesc(trimmed);
         if (byLic.isPresent()) return byLic;
-        return licenseRepository.findByReferenceNumber(existingLicenseNumber.trim());
+        return licenseRepository.findByReferenceNumber(trimmed);
     }
 
     public List<LicenseApplication> getApplicationsByUser(Long userId) {

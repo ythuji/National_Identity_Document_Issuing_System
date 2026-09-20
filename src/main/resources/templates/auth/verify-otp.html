@@ -30,20 +30,17 @@
                         <span th:text="${infoMessage}"></span>
                     </div>
 
-                    <!-- Error Alert -->
-                    <div th:if="${errorMessage}" class="alert alert-danger py-2 small" role="alert">
-                        <i class="bi bi-exclamation-triangle-fill me-1"></i>
-                        <span th:text="${errorMessage}"></span>
-                    </div>
-
-                    <form th:action="@{/verify-otp}" method="post">
+                    <form th:action="@{/verify-otp}" method="post" class="needs-validation" novalidate>
                         <input type="hidden" name="email" th:value="${email}">
 
                         <div class="mb-3 text-start">
                             <label for="otpCode" class="form-label text-center d-block">6-Digit Verification Code</label>
                             <input type="text" class="form-control text-center fw-bold fs-4 tracking-wider"
                                    id="otpCode" name="otpCode" maxlength="6" pattern="[0-9]{6}"
-                                   placeholder="123456" required autofocus autocomplete="one-time-code">
+                                   placeholder="123456" required autofocus autocomplete="one-time-code"
+                                   th:classappend="${errorMessage != null} ? 'is-invalid' : ''">
+                            <div class="invalid-feedback text-center d-block" th:if="${errorMessage}" th:text="${errorMessage}"></div>
+                            <div class="invalid-feedback text-center" th:unless="${errorMessage}">Please enter the 6-digit verification code.</div>
                             <div class="form-text text-center">Valid for 15 minutes</div>
                         </div>
 

@@ -14,6 +14,8 @@ public interface LicenseApplicationRepository extends JpaRepository<LicenseAppli
     List<LicenseApplication> findByUserIdOrderByCreatedAtDesc(Long userId);
     Optional<LicenseApplication> findByReferenceNumber(String referenceNumber);
     Optional<LicenseApplication> findTopByExistingLicenseNumberOrderByCreatedAtDesc(String existingLicenseNumber);
+    Optional<LicenseApplication> findTopByIssuedLicenseNumberOrderByCreatedAtDesc(String issuedLicenseNumber);
+    boolean existsByIssuedLicenseNumber(String issuedLicenseNumber);
     List<LicenseApplication> findByStatusInOrderByCreatedAtAsc(List<ApplicationStatus> statuses);
     Optional<LicenseApplication> findFirstByUserIdAndCategoryAndIsDraftTrue(Long userId, ApplicationCategory category);
     long countByUserId(Long userId);

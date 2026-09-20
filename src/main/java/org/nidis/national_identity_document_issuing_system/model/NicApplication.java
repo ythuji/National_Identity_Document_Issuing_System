@@ -50,6 +50,9 @@ public class NicApplication {
     @Column(length = 20)
     private String existingNicNumber;
 
+    @Column(name = "issued_nic_number", length = 20)
+    private String issuedNicNumber;
+
     @Column(nullable = false, length = 100)
     private String fullName;
 

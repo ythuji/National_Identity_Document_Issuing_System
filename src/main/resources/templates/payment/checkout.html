@@ -17,12 +17,7 @@
                 <p class="text-muted">Digital fee settlement for National Identity Document issuing services.</p>
             </div>
 
-            <!-- Error alert -->
-            <div th:if="${errorMessage}" class="alert alert-danger alert-dismissible fade show" role="alert">
-                <i class="bi bi-exclamation-triangle-fill me-2"></i>
-                <span th:text="${errorMessage}"></span>
-                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-            </div>
+
 
             <div class="row g-4">
                 <!-- Left: Application Fee Order Summary -->
@@ -87,7 +82,7 @@
                                 </div>
                             </div>
 
-                            <form th:action="@{/payment/process}" th:object="${paymentDto}" method="post">
+                            <form th:action="@{/payment/process}" th:object="${paymentDto}" method="post" class="needs-validation" novalidate>
                                 <input type="hidden" th:field="*{applicationType}">
                                 <input type="hidden" th:field="*{applicationId}">
                                 <input type="hidden" th:field="*{applicationReference}">
@@ -100,18 +95,21 @@
                                     <input type="text" class="form-control text-uppercase" id="cardHolderName" th:field="*{cardHolderName}"
                                            placeholder="e.g. K. A. D. SILVA"
                                            th:classappend="${#fields.hasErrors('cardHolderName')} ? 'is-invalid' : ''" required>
-                                    <div class="invalid-feedback" th:errors="*{cardHolderName}"></div>
+                                    <div class="invalid-feedback d-block" th:if="${#fields.hasErrors('cardHolderName')}" th:errors="*{cardHolderName}"></div>
+                                    <div class="invalid-feedback" th:unless="${#fields.hasErrors('cardHolderName')}">Please enter the cardholder's full name.</div>
                                 </div>
 
                                 <div class="mb-3">
                                     <label for="cardNumber" class="form-label">Card Number <span class="text-danger">*</span></label>
-                                    <div class="input-group">
+                                    <div class="input-group has-validation">
                                         <span class="input-group-text bg-white"><i class="bi bi-credit-card-2-front"></i></span>
                                         <input type="text" class="form-control font-monospace" id="cardNumber" th:field="*{cardNumber}"
                                                placeholder="4242 4242 4242 4242" maxlength="19"
-                                               th:classappend="${#fields.hasErrors('cardNumber')} ? 'is-invalid' : ''" required>
+                                               th:classappend="${#fields.hasErrors('cardNumber') || (errorMessage != null && !#fields.hasErrors('cardNumber'))} ? 'is-invalid' : ''" required>
                                     </div>
                                     <div class="invalid-feedback d-block" th:if="${#fields.hasErrors('cardNumber')}" th:errors="*{cardNumber}"></div>
+                                    <div class="invalid-feedback d-block" th:if="${errorMessage != null && !#fields.hasErrors('cardNumber')}" th:text="${errorMessage}"></div>
+                                    <div class="invalid-feedback" th:unless="${#fields.hasErrors('cardNumber') || errorMessage != null}">Please enter a valid 16-digit card number.</div>
                                 </div>
 
                                 <div class="row">
@@ -128,16 +126,18 @@
                                         </div>
                                         <div class="invalid-feedback d-block" th:if="${#fields.hasErrors('expiryMonth')}" th:errors="*{expiryMonth}"></div>
                                         <div class="invalid-feedback d-block" th:if="${#fields.hasErrors('expiryYear')}" th:errors="*{expiryYear}"></div>
+                                        <div class="invalid-feedback" th:unless="${#fields.hasErrors('expiryMonth') || #fields.hasErrors('expiryYear')}">Enter valid expiry MM and YY.</div>
                                     </div>
                                     <div class="col-md-5 mb-3">
                                         <label for="cvv" class="form-label">CVV / CVC <span class="text-danger">*</span></label>
-                                        <div class="input-group">
+                                        <div class="input-group has-validation">
                                             <input type="password" class="form-control text-center font-monospace" id="cvv"
                                                    th:field="*{cvv}" placeholder="123" maxlength="4"
                                                    th:classappend="${#fields.hasErrors('cvv')} ? 'is-invalid' : ''" required>
                                             <span class="input-group-text bg-white" title="3 or 4 digits on back of card"><i class="bi bi-question-circle"></i></span>
                                         </div>
                                         <div class="invalid-feedback d-block" th:if="${#fields.hasErrors('cvv')}" th:errors="*{cvv}"></div>
+                                        <div class="invalid-feedback" th:unless="${#fields.hasErrors('cvv')}">Enter 3 or 4 digit security code.</div>
                                     </div>
                                 </div>
 

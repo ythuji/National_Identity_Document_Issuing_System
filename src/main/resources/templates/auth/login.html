@@ -37,13 +37,6 @@
                 <p>Enter your details to continue to the NIDIS portal.</p>
             </div>
 
-                    <!-- Error Alert -->
-                    <div th:if="${errorMessage}" class="alert alert-danger alert-dismissible fade show" role="alert">
-                        <i class="bi bi-exclamation-triangle-fill me-2"></i>
-                        <span th:text="${errorMessage}"></span>
-                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                    </div>
-
                     <!-- Success Alert -->
                     <div th:if="${successMessage}" class="alert alert-success alert-dismissible fade show" role="alert">
                         <i class="bi bi-check-circle-fill me-2"></i>
@@ -51,15 +44,17 @@
                         <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
                     </div>
 
-                    <form th:action="@{/login}" method="post" class="auth-form">
+                    <form th:action="@{/login}" method="post" class="auth-form needs-validation" novalidate>
                         <!-- CSRF Token handled automatically by Spring Security / Thymeleaf -->
                         <div class="mb-4">
                             <label for="email" class="form-label">Email Address</label>
                             <div class="input-group">
                                 <span class="input-group-text" aria-hidden="true"><i class="bi bi-envelope"></i></span>
                                 <input type="email" class="form-control" id="email" name="email"
+                                       th:classappend="${param.error != null or errorMessage != null} ? 'is-invalid' : ''"
                                        placeholder="name@example.com" required autofocus>
                             </div>
+                            <div class="invalid-feedback">Please enter a valid email address.</div>
                         </div>
 
                         <div class="mb-4">
@@ -70,8 +65,13 @@
                             <div class="input-group">
                                 <span class="input-group-text" aria-hidden="true"><i class="bi bi-key"></i></span>
                                 <input type="password" class="form-control" id="password" name="password"
+                                       th:classappend="${param.error != null or errorMessage != null} ? 'is-invalid' : ''"
                                        placeholder="••••••••" required>
                             </div>
+                            <div class="invalid-feedback d-block" th:if="${param.error != null or errorMessage != null}">
+                                <span th:text="${errorMessage != null ? errorMessage : 'Invalid email or password. Please verify your credentials.'}">Invalid credentials</span>
+                            </div>
+                            <div class="invalid-feedback" th:unless="${param.error != null or errorMessage != null}">Please enter your password.</div>
                         </div>
 
                         <div class="d-grid mt-4">

@@ -22,4 +22,5 @@ public class DashboardApplicationItem {
     private LocalDateTime createdAt;
     private ApplicationStatus status;
     private String viewUrl;
+    private String documentNumber;
 }

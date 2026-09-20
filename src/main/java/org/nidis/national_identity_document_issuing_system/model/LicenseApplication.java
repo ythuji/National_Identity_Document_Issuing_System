@@ -49,6 +49,9 @@ public class LicenseApplication {
     @Column(length = 30)
     private String existingLicenseNumber;
 
+    @Column(name = "issued_license_number", length = 30)
+    private String issuedLicenseNumber;
+
     @Column(nullable = false, length = 100)
     private String fullName;
 

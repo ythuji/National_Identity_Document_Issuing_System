@@ -149,6 +149,11 @@
                         <tr th:each="item : ${recentApplications}">
                             <td class="ps-4 fw-bold">
                                 <a th:href="@{${item.viewUrl}}" th:text="${item.referenceNumber}" class="dashboard-reference text-decoration-none"></a>
+                                <div th:if="${item.documentNumber}" class="small mt-1">
+                                    <span class="badge bg-success bg-opacity-10 text-success border border-success-subtle font-monospace">
+                                        <i class="bi bi-patch-check-fill me-1"></i><span th:text="${item.documentNumber}"></span>
+                                    </span>
+                                </div>
                             </td>
                             <td>
                                 <span th:if="${#strings.contains(item.serviceName, 'License')}" class="badge bg-primary bg-opacity-10 text-primary">

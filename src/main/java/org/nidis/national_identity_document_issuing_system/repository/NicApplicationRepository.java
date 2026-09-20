@@ -15,6 +15,8 @@ public interface NicApplicationRepository extends JpaRepository<NicApplication, 
     Optional<NicApplication> findByUserIdAndCategoryAndIsDraftTrue(Long userId, ApplicationCategory category);
     Optional<NicApplication> findByReferenceNumber(String referenceNumber);
     Optional<NicApplication> findFirstByExistingNicNumberOrderByCreatedAtDesc(String existingNicNumber);
+    Optional<NicApplication> findTopByIssuedNicNumberOrderByCreatedAtDesc(String issuedNicNumber);
+    boolean existsByIssuedNicNumber(String issuedNicNumber);
     List<NicApplication> findByStatusOrderByCreatedAtDesc(ApplicationStatus status);
     List<NicApplication> findByStatusInOrderByCreatedAtDesc(List<ApplicationStatus> statuses);
     long countByStatus(ApplicationStatus status);

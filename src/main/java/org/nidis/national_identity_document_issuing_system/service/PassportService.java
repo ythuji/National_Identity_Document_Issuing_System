@@ -145,9 +145,12 @@ public class PassportService {
 
     public Optional<PassportApplication> prefillBioData(String existingPassportNumber) {
         if (existingPassportNumber == null || existingPassportNumber.isBlank()) return Optional.empty();
-        Optional<PassportApplication> byPass = passportRepository.findTopByExistingPassportNumberOrderByCreatedAtDesc(existingPassportNumber.trim());
+        String trimmed = existingPassportNumber.trim();
+        Optional<PassportApplication> byIssued = passportRepository.findTopByIssuedPassportNumberOrderByCreatedAtDesc(trimmed);
+        if (byIssued.isPresent()) return byIssued;
+        Optional<PassportApplication> byPass = passportRepository.findTopByExistingPassportNumberOrderByCreatedAtDesc(trimmed);
         if (byPass.isPresent()) return byPass;
-        return passportRepository.findByReferenceNumber(existingPassportNumber.trim());
+        return passportRepository.findByReferenceNumber(trimmed);
     }
 
     public List<PassportApplication> getApplicationsByUser(Long userId) {

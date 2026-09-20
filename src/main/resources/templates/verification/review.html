@@ -106,6 +106,10 @@
                                     <span th:if="${app.medicalCertRequired != true}" class="badge bg-light text-muted border">Standard</span>
                                 </td>
                             </tr>
+                            <tr th:if="${app.issuedLicenseNumber != null and !#strings.isEmpty(app.issuedLicenseNumber)}">
+                                <th class="text-muted ps-0">Official Issued License No:</th>
+                                <td class="fw-bold text-success font-monospace" th:text="${app.issuedLicenseNumber}"></td>
+                            </tr>
                             <tr th:if="${app.existingLicenseNumber != null and !#strings.isEmpty(app.existingLicenseNumber)}">
                                 <th class="text-muted ps-0">Existing License No:</th>
                                 <td class="fw-bold text-dark font-monospace" th:text="${app.existingLicenseNumber}"></td>
@@ -137,6 +141,10 @@
                             <tr>
                                 <th class="text-muted ps-0">Dual Citizenship:</th>
                                 <td th:text="${app.dualCitizenship == true ? 'Yes' : 'No'}"></td>
+                            </tr>
+                            <tr th:if="${app.issuedPassportNumber != null and !#strings.isEmpty(app.issuedPassportNumber)}">
+                                <th class="text-muted ps-0">Official Issued Passport No:</th>
+                                <td class="fw-bold text-success font-monospace" th:text="${app.issuedPassportNumber}"></td>
                             </tr>
                             <tr th:if="${app.existingPassportNumber != null and !#strings.isEmpty(app.existingPassportNumber)}">
                                 <th class="text-muted ps-0">Previous Passport No:</th>
@@ -173,6 +181,10 @@
                             <tr>
                                 <th class="text-muted ps-0">Divisional Secretariat:</th>
                                 <td class="fw-semibold text-dark" th:text="${app.divisionalSecretariat}"></td>
+                            </tr>
+                            <tr th:if="${app.issuedNicNumber != null and !#strings.isEmpty(app.issuedNicNumber)}">
+                                <th class="text-muted ps-0">Official Issued NIC No:</th>
+                                <td class="fw-bold text-success font-monospace" th:text="${app.issuedNicNumber}"></td>
                             </tr>
                             <tr th:if="${app.existingNicNumber != null and !#strings.isEmpty(app.existingNicNumber)}">
                                 <th class="text-muted ps-0">Previous NIC No:</th>
@@ -263,7 +275,8 @@
                 <!-- Shipped banner (read-only when already shipped) -->
                 <div th:if="${#strings.toString(app.status) == 'SHIPPED'}" class="alert alert-info py-2 px-3 mb-0 d-flex align-items-center gap-2">
                     <i class="bi bi-box-seam-fill"></i>
-                    <span>Document has been <strong>shipped</strong> to the citizen. Awaiting receipt confirmation.</span>
+                    <span>Document has been <strong>shipped</strong> to citizen (Official No: 
+                        <strong class="font-monospace text-dark" th:text="${app.issuedLicenseNumber != null ? app.issuedLicenseNumber : (app.issuedPassportNumber != null ? app.issuedPassportNumber : (app.issuedNicNumber != null ? app.issuedNicNumber : 'N/A'))}"></strong>). Awaiting citizen receipt confirmation.</span>
                 </div>
 
                 <!-- Received banner (read-only when already received) -->
